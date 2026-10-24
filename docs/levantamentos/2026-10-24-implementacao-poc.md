@@ -48,3 +48,19 @@ O cron nativo foi reexecutado no workerd local e retornou outcome=ok. CI do PR p
 - Credenciais de leitura e demonstração distintas, mantidas somente em configuração privada. Nenhum webhook de outro projeto foi alterado.
 
 Homologação no Telegram continua condicionada ao bot exclusivo: getMe, configuração do webhook e ciclo real com participante autorizado ainda não foram executados.
+
+## Auditoria de requisitos da implementação
+
+| Requisito | Evidência | Limite |
+|---|---|---|
+| RF01 — produto/data | Perfil fictício identificado na primeira resposta; testes de data marcada, pretendida, sem data e confirmação tardia | Produto único da demonstração |
+| RF02 — alteração/histórico | Testes SQL/serviço e cenário A remoto; C preserva ausência e cancelamento em tentativas distintas | Sem alunos reais |
+| RF03 — contato pós-prova | Testes de agenda/realização, handler scheduled no workerd e cron registrado no deploy | Envio real de Telegram pendente |
+| RF04 — resultado/correção | Testes de domínio e correção B remota preservando avaliações | Resultado declarado |
+| RF05/RF06 — curso/simulados | Questionário completo A, não uso B, comentário e dimensões separados; testes HTTP/domínio | Percepção, não equivalência objetiva |
+| RF07 — consulta | Auth/CSP remotos, listagem saneada e métricas testadas com denominadores | Visão interna simples |
+| RF08 — pausa/retomada | Cenário C remoto e followup cancelado confirmado diretamente no D1 | Janela sending documentada |
+| RF09 — persistência/dedup | Testes SQLite/CAS/updates repetidos; registros remotos relidos e histórico preservado | Timeout externo permanece incerto |
+| RF10 — demo | A/B/C executados por HTTP com relógio individual e sender simulado | Bot exclusivo ainda inexistente |
+
+Entregáveis de código, PRD, configuração, harness, revisão, testes/build, documentação e publicação da demonstração foram verificados. O aceite de canal real previsto no item 6 da definição de pronto permanece explicitamente condicionado à disponibilidade do bot.
