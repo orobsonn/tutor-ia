@@ -1,10 +1,36 @@
 # Changelog
 
-As mudanças relevantes seguem o formato Keep a Changelog. Esta etapa é documental; ainda não há versão de aplicação ou release publicada.
+As mudanças relevantes seguem o formato Keep a Changelog. A implementação da POC permanece em Unreleased; ainda não há tag ou GitHub Release publicada.
 
 ## [Unreleased]
 
 ### Added
+- Modo /teste no Telegram com pós-prova imediato, histórico separado e identificação na consulta, sem contatos futuros ou inclusão nos indicadores regulares.
+
+### Fixed
+- Comparação da identidade da tentativa ao substituir o acompanhamento, impedindo substituições concorrentes com a mesma revisão.
+
+
+### Added
+
+- PRD, harness vendorizado e implementação inicial da POC Telegram/Flue/Cloudflare.
+- Pesquisa determinística, persistência, agenda/outbox, consulta protegida e simulador.
+- Testes de domínio, SQL, HTTP, autorização, agenda e entrega incerta.
+- Datas marcadas/pretendidas/sem data, cenários A/B/C e indicadores com denominadores explícitos.
+
+### Changed
+
+- Mensagens do Telegram em blocos legíveis, datas brasileiras e resumo das respostas em português.
+- Entrada DD/MM/AAAA aceita com validação e normalização para a data canônica.
+
+- Consulta da equipe em fichas responsivas, com feedbacks e comentários sem rolagem horizontal.
+- Controles de simulação retirados da interface de consulta.
+
+### Security
+
+- Segredos fora do Git, allowlist de participantes, callbacks assinados e acessos administrativos separados.
+
+### Documentation
 
 - Organização da documentação pública do Tutor IA.
 - Escopo vigente da POC, visão futura, histórias e critérios de aceite.

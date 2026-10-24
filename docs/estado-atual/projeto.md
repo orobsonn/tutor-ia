@@ -6,11 +6,11 @@ Atualizado em 24/10/2026.
 |---|---|
 | Direção de produto | Recorte adotado: prova, resultado e feedback de aderência |
 | Documentação | Histórias, limites, roteiro e decisões registrados |
-| POC executável | Ainda não implementada |
-| Dados da demonstração | Exemplos fictícios documentados; não há banco provisionado |
-| Canal | Não escolhido nem conectado; Telegram ou interface própria são possibilidades |
+| POC executável | Ciclo simulado verificado localmente e por HTTP no Worker publicado com D1; revisão independente aprovada |
+| Dados da demonstração | Exemplos fictícios; D1 local e banco exclusivo remoto criado com migração aplicada |
+| Canal | Ciclo principal real concluído: agendamento, realização, resultado, curso, simulados e comentário persistidos |
 | Integrações acadêmicas | Fora da POC; desnecessárias para o recorte atual |
 | Homologação | Demonstração ainda não realizada |
-| Produção | Não iniciada |
+| Ambiente publicado | Demonstração exclusiva na Cloudflare, sem bot conectado nem alunos reais |
 
-Próxima etapa: resolver [pendências da POC](../backlog/perguntas-em-aberto.md), fazer onboarding do harness exigido pelo operador e preparar a implementação. A autorização de construção não constitui escolha de arquitetura ou autorização para contatar alunos reais.
+PRD consolidado e implementação disponível para demonstração simulada. Harness Codex v3.10.2 instalado. Próxima etapa: homologação humana da demonstração e definição dos ajustes de produto. O ciclo principal foi testado pelo Telegram com antecipação isolada do vencimento fictício. A autorização de construção não constitui escolha de arquitetura ou autorização para contatar alunos reais.

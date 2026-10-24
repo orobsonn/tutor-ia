@@ -1,5 +1,6 @@
 # Referências
 
+- [PRD da POC](prd-poc.md): requisitos e definição de pronto.
 - [Histórias de usuário](historias-de-usuario.md): comportamento e critérios de aceite.
 - [Glossário](glossario.md): termos usados pelo produto.
 - [Dados e perguntas](dados-e-perguntas.md): informação mínima e pesquisa proposta.

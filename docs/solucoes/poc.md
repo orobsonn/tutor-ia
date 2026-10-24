@@ -1,0 +1,70 @@
+# POC Telegram — funcionamento e execução
+
+Atualizado em 24/10/2026. Código implementado e ciclo demonstrado no runtime local workerd com D1 local. Deploy remoto e cenários simulados foram verificados; o ciclo principal real do Telegram também foi verificado com vencimento fictício antecipado, conforme registrado no [estado do projeto](../estado-atual/projeto.md).
+
+## Implementado
+
+- Pesquisa guiada, sem LLM no caminho crítico, com datas marcadas/pretendidas/ausentes, confirmação/remarcação, realização, resultado, curso e simulados.
+- Flue 2.3.0 integra o ingresso verificado do Telegram e o build Cloudflare. Não há agente autônomo ou router de conversa público; não foi adicionada inferência só para preencher formulário.
+- Persistência de tentativas, eventos e outbox em D1; conflito de revisão e repetição de update não sobrescrevem estado.
+- Contato ilustrativo D+1 às 10h America/Fortaleza; agenda processada por cron a cada cinco minutos, sem modificar relógio global.
+- Consulta da equipe por fichas responsivas; cenários A/B/C restritos à API de testes com segredo separado.
+- Sender simulado para cenários; sender Telegram exclusivo para participantes permitidos, depois da configuração.
+
+## Rodar localmente
+
+Requer Node 22.19 ou superior, compatível com a versão fixada do framework.
+
+```sh
+npm ci
+cp .dev.vars.example .dev.vars
+# Preencher credenciais locais fora do Git; não colar valores em issues/commits.
+npx wrangler d1 migrations apply DB --local
+npm run dev -- --host 127.0.0.1
+```
+
+Abrir o endereço local informado pelo Vite. Informar a credencial de leitura para consultar as fichas de respostas. Elas permanecem somente na memória da página; não são gravadas em URL, HTML, log ou localStorage. Sem bot, deixar credenciais Telegram vazias; testes e cenários técnicos pela API restrita continuam disponíveis.
+
+```sh
+npm test
+npm run typecheck
+npm run build
+npm audit --omit=dev
+```
+
+O ID de banco no wrangler.jsonc versionado é um placeholder de desenvolvimento. A configuração de deploy deve apontar exclusivamente para o banco criado para esta POC, sem incluir identificação pessoal da conta no Git.
+
+## Configuração privada do Telegram
+
+Usar bot exclusivo, criado pelo responsável da conta. Nunca redirecionar webhook de outro projeto. Variáveis privadas: TELEGRAM_BOT_TOKEN, TELEGRAM_WEBHOOK_SECRET_TOKEN e TELEGRAM_ALLOWED_USER_IDS (IDs numéricos exatos, separados por vírgula, não usernames). O participante precisa iniciar o chat privado com /start. Negar grupos, usuários não autorizados e remetente diferente do chat.
+
+Registrar webhook somente após verificar getMe do bot e publicar o endpoint desta POC: `/channels/telegram/webhook`, com secret_token próprio e updates de mensagens/callbacks. URLs, tokens e IDs privados ficam fora desta documentação pública. Código de ingress/sender está implementado, mas isso não comprova que um bot real já foi conectado.
+
+Comandos: /start, /data, /pausar, /retomar, /cancelar, /resultado, /resumo e /nova. /nova cria tentativa separada, preservando a anterior. Datas fechadas DD/MM/AAAA (também aceita AAAA-MM-DD), normalizadas internamente, e botões assinados evitam depender de interpretação livre. Uma pergunta antiga não pode alterar revisão nova.
+
+## Consulta e demonstração
+
+- `GET /`: página sem dados/credenciais embutidos.
+- `GET /health`: saúde básica; não é teste completo de persistência.
+- `GET /api/records`: Authorization Bearer com OPERATOR_READ_TOKEN; lista saneada, sem expor IDs de chat.
+- `POST /api/demo`: Authorization Bearer com OPERATOR_DEMO_TOKEN; cenário A/B/C e ação enumerada next/reschedule/pause/resume/cancel/absent/correct/new; sem parâmetros de timestamp ou participante livres.
+
+Todos os exemplos acadêmicos são fictícios. A flag interna de modo distingue transporte simulado de Telegram; mesmo no Telegram, produto/certificação desta POC continuam fictícios. O operador não deve inserir dados acadêmicos reais nesta etapa.
+
+## Entrega incerta e limites
+
+Outbox pending → sending → sent/simulated/unknown. Pausa/remarcação invalidam contatos ainda pendentes; o sistema revalida estado antes da chamada externa. Depois de sending, o provedor pode já ter aceitado e não há garantia de cancelamento. Timeout/crash vira unknown, sem retry automático. Isso privilegia não duplicar e pode exigir reconciliação pelo operador.
+
+A recuperação de sending antigo ocorre após dois minutos, sem reenvio. Jobs simulados não concorrem com o lote do Telegram. A leitura da equipe é intencionalmente simples e adequada à pequena demonstração; não é painel multicliente ou integração CRM.
+
+getMe, setWebhook, /start, callback assinado e persistência iniciais foram verificados no bot exclusivo. O ciclo principal pós-prova completo também foi executado, usando o cron publicado e antecipação isolada do vencimento de uma tentativa fictícia. A revisão final e a evidência datada indicam o que efetivamente foi verificado.
+
+## Liberar um avaliador
+
+O bot aceita somente IDs numéricos privados autorizados em TELEGRAM_ALLOWED_USER_IDS. Identificar a conta exata do avaliador antes de acrescentá-la à configuração privada, preservando as já autorizadas. Um @ pode ajudar a localizar a conta, mas não substitui o ID na regra de acesso. Não abrir o bot a todos para contornar essa identificação.
+
+Para consultar a tela, compartilhar privadamente o endereço e somente a credencial de leitura. Não é preciso conceder acesso à conta Cloudflare ou ao repositório. Para testar o pós-prova imediatamente, antecipar de forma controlada apenas a tentativa fictícia correspondente; o fluxo normal aguarda D+1.
+
+## Teste imediato pelo Telegram
+
+O comando /teste permite percorrer a coleta completa na hora: confirmar uma data fictícia marcada avança ao pós-prova, sem D+1 e sem operação técnica. A tentativa é identificada como teste e excluída dos indicadores regulares. /nova mantém o fluxo normal. Provas normais confirmadas em andamento são preservadas e bloqueiam a criação de teste até sua conclusão. A autorização do Telegram permanece a mesma.

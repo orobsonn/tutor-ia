@@ -1,0 +1,6 @@
+# Valores vazios: preencher apenas no arquivo local ignorado. Nunca publicar IDs ou tokens reais.
+TELEGRAM_BOT_TOKEN=
+TELEGRAM_WEBHOOK_SECRET_TOKEN=
+TELEGRAM_ALLOWED_USER_IDS=
+OPERATOR_READ_TOKEN=
+OPERATOR_DEMO_TOKEN=

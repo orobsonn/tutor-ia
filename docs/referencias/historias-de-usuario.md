@@ -1,6 +1,6 @@
 # Histórias de usuário da POC
 
-Status: recorte adotado em 24/10/2026; histórias documentadas, não implementadas. Fonte de escopo: [POC vigente](../estado-atual/escopo-poc.md).
+Status: recorte adotado em 24/10/2026; histórias implementadas para demonstração com dados fictícios; integração real do Telegram ainda pendente. Fonte de escopo: [POC vigente](../estado-atual/escopo-poc.md).
 
 ## US01 — Informar a prova
 
