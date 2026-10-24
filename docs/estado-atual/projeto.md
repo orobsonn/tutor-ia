@@ -6,8 +6,8 @@ Atualizado em 24/10/2026.
 |---|---|
 | Direção de produto | Recorte adotado: prova, resultado e feedback de aderência |
 | Documentação | Histórias, limites, roteiro e decisões registrados |
-| POC executável | Implementação iniciada; aceite executável pendente |
-| Dados da demonstração | Exemplos fictícios documentados; não há banco provisionado |
+| POC executável | Ciclo completo verificado no runtime local workerd com D1; revisão final pendente |
+| Dados da demonstração | Exemplos fictícios e banco D1 local; nenhum banco remoto criado nesta etapa |
 | Canal | Telegram escolhido; bot exclusivo ainda não criado |
 | Integrações acadêmicas | Fora da POC; desnecessárias para o recorte atual |
 | Homologação | Demonstração ainda não realizada |

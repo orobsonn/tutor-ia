@@ -34,4 +34,4 @@ Acompanhamento de provas e coleta de feedback sobre a preparação oferecida por
 
 A POC pergunta a data da prova, faz contato depois, registra realização/resultado e coleta a percepção do aluno sobre a aderência do curso e dos simulados. Ela não compara objetivamente questões de provas e não promete aprovação.
 
-Ainda não há aplicativo executável, canal conectado, banco provisionado ou comandos de instalação. A construção usa Telegram, Flue e Cloudflare; o bot exclusivo ainda não foi criado. Regras de manutenção: [AGENTS.md](AGENTS.md). Mudanças: [CHANGELOG.md](CHANGELOG.md).
+Já há implementação e simulador local com persistência; o Telegram real ainda não foi conectado. [Como executar e configurar](docs/solucoes/poc.md). A construção usa Telegram, Flue e Cloudflare; o bot exclusivo ainda não foi criado. Regras de manutenção: [AGENTS.md](AGENTS.md). Mudanças: [CHANGELOG.md](CHANGELOG.md).
