@@ -1,6 +1,6 @@
 # Changelog
 
-As mudanças relevantes seguem o formato Keep a Changelog. Esta etapa é documental; ainda não há versão de aplicação ou release publicada.
+As mudanças relevantes seguem o formato Keep a Changelog. A implementação da POC permanece em Unreleased; ainda não há tag ou GitHub Release publicada.
 
 ## [Unreleased]
 
@@ -9,6 +9,7 @@ As mudanças relevantes seguem o formato Keep a Changelog. Esta etapa é documen
 - PRD, harness vendorizado e implementação inicial da POC Telegram/Flue/Cloudflare.
 - Pesquisa determinística, persistência, agenda/outbox, consulta protegida e simulador.
 - Testes de domínio, SQL, HTTP, autorização, agenda e entrega incerta.
+- Datas marcadas/pretendidas/sem data, cenários A/B/C e indicadores com denominadores explícitos.
 
 ### Security
 

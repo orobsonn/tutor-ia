@@ -1,6 +1,6 @@
 # POC Telegram — funcionamento e execução
 
-Atualizado em 24/10/2026. Código implementado e ciclo demonstrado no runtime local workerd com D1 local. Integração real do Telegram e deploy remoto permanecem separados no [estado do projeto](../estado-atual/projeto.md).
+Atualizado em 24/10/2026. Código implementado e ciclo demonstrado no runtime local workerd com D1 local. Deploy remoto e cenários simulados foram verificados; integração real do Telegram permanece pendente, conforme registrado no [estado do projeto](../estado-atual/projeto.md).
 
 ## Implementado
 

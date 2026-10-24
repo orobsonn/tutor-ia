@@ -1,6 +1,6 @@
 # Implementação e evidência — 24/10/2026
 
-Status: desenvolvimento em andamento, antes da revisão final e publicação remota.
+Status: implementação revisada e publicada em ambiente de demonstração; Telegram real pendente.
 
 ## Contrato e decisões
 
@@ -26,10 +26,25 @@ O teste real de evento scheduled no runtime local retornou outcome=exception: o 
 
 ## Limites
 
-Não é E2E do Telegram: token/bot inexistentes. Não há efeito externo de envio na simulação, não há dados acadêmicos reais e não foi verificada eficácia pedagógica. Deploy remoto, revisão final e execução da CI serão registrados quando ocorrerem, sem retroagir alegações.
+Não é E2E do Telegram: token/bot inexistentes. Não há efeito externo de envio na simulação, não há dados acadêmicos reais e não foi verificada eficácia pedagógica. A evidência remota abaixo se refere ao simulador autenticado, sem entrega real de mensagens.
 
 ## Revisão independente e correções
 
-A revisão final inicial pediu alterações: revogação da allowlist no envio, distinção de data pretendida, cenário C/correção, limite total do cron, rejeição de segredos iguais, confirmação tardia e denominadores dos indicadores. Foram adicionadas correções e testes direcionados; nova revisão independente está em andamento.
+A revisão final inicial pediu alterações: revogação da allowlist no envio, distinção de data pretendida, cenário C/correção, limite total do cron, rejeição de segredos iguais, confirmação tardia e denominadores dos indicadores. As correções foram validadas por revisão independente, incluindo preservação da ausência e remarcação para outra data; resultado final APPROVE, sem achados no delta.
 
-O cron nativo foi reexecutado no workerd local e retornou outcome=ok. CI do PR passou na revisão anterior; deverá rodar novamente para as correções. Nenhuma alegação de Telegram real decorre desses testes.
+O cron nativo foi reexecutado no workerd local e retornou outcome=ok. CI do PR passou também para as correções. Nenhuma alegação de Telegram real decorre desses testes.
+
+## Evidência final e publicação remota
+
+- Commit de aplicação publicado: `3c1bbe1`; 44/44 testes locais, typecheck, build e CI aprovados.
+- Worker exclusivo com binding D1 e cron de cinco minutos; deployment ativo confirmado a 100% na versão `c161887a-5d2f-433c-9ad9-e1dec451404a`. IDs de conta/banco e credenciais não foram versionados.
+- Migração remota inicial executou 10 comandos no banco exclusivo.
+- Health remoto 200 com Telegram não configurado; consulta sem credencial 401; página com CSP restritiva.
+- Cenário A: data remarcada com novo vencimento, prova realizada, aprovação e avaliações separadas.
+- Cenário B: resultado pendente com não uso de simulados, depois correção para aprovação preservando feedback.
+- Cenário C: pausa impede followup; retomada e ausência não abrem avaliação. Cancelamento posterior é rejeitado; nova tentativa permite cancelamento preservando a ausência anterior.
+- Quatro tentativas persistidas e consultadas novamente por HTTP. Consulta direta ao D1 confirmou que a entrega cancelada corresponde ao followup do cenário pausado.
+- A primeira asserção remota exigia apenas status simulated e falhou diante desse cancelamento correto. A evidência foi reconciliada sem repetir as ações: 41 entregas simuladas e um followup cancelado, todos do modo demo; nenhum envio real.
+- Credenciais de leitura e demonstração distintas, mantidas somente em configuração privada. Nenhum webhook de outro projeto foi alterado.
+
+Homologação no Telegram continua condicionada ao bot exclusivo: getMe, configuração do webhook e ciclo real com participante autorizado ainda não foram executados.

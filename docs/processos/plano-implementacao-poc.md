@@ -56,5 +56,5 @@ Executar suíte, typecheck, build, revisão independente do diff e varredura de 
 
 - PRD criado; goal ativo; bot não existe e não bloqueia implementação/simulação.
 - Harness v3.10.2 instalado. A versão do core local anterior estava defasada; instalação usou release remota atual em nova pasta vendorizada, sem alterar a cópia de origem.
-- Fase atual: implementação local concluída; domínio, SQL, HTTP, serviço e cron testados. Revisão final/publicação remota pendentes.
+- Fase atual: implementação revisada e publicada na Cloudflare; domínio, SQL, HTTP, serviço e cron testados. Cenários simulados remotos persistidos; Telegram real pendente.
 - Ruling: handlers nativos de Cron ficam em src/cloudflare.ts, não apenas no objeto de app.ts. O evento scheduled real no workerd foi observado falhando e depois passando com outcome=ok.
