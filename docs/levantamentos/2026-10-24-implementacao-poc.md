@@ -95,3 +95,9 @@ O cron publicado enviou “Você realizou a prova prevista?” às 12h15 no fuso
 A consulta autenticada foi relida e comparada campo a campo com as respostas. Consulta direta ao D1 confirmou exatamente um followup sent e doze respostas reply sent nessa tentativa. Webhook sem pendências e sem erro. A tentativa finalizada não é elegível para novo contato agendado.
 
 Comprovação visual e identificadores técnicos permanecem em arquivo privado. Não houve alteração no código da aplicação nem novo deploy para esse teste. O resultado valida o caminho principal completo com transporte real; os casos alternativos têm a evidência simulada/automatizada já descrita, sem alegar que todos foram repetidos no Telegram.
+
+## Revisão da consulta da equipe — 24/10/2026
+
+A pedido do responsável de produto, a tabela larga foi substituída por fichas responsivas. Resultado/data/realização, curso, dimensões dos simulados e comentário são apresentados em blocos legíveis. Indicadores detalhados ficam recolhidos; os denominadores e as distinções de não uso/ausência de resposta foram preservados.
+
+A área “Simular conversa com aluno” e sua credencial/controles foram retiradas da consulta. A API técnica restrita permanece para os testes existentes. O bot continua determinístico, sem IA generativa; essa alteração é de apresentação da consulta.

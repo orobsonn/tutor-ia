@@ -8,7 +8,7 @@ Atualizado em 24/10/2026. Código implementado e ciclo demonstrado no runtime lo
 - Flue 2.3.0 integra o ingresso verificado do Telegram e o build Cloudflare. Não há agente autônomo ou router de conversa público; não foi adicionada inferência só para preencher formulário.
 - Persistência de tentativas, eventos e outbox em D1; conflito de revisão e repetição de update não sobrescrevem estado.
 - Contato ilustrativo D+1 às 10h America/Fortaleza; agenda processada por cron a cada cinco minutos, sem modificar relógio global.
-- Consulta da equipe e simulador de cenários A/B/C com segredos distintos.
+- Consulta da equipe por fichas responsivas; cenários A/B/C restritos à API de testes com segredo separado.
 - Sender simulado para cenários; sender Telegram exclusivo para participantes permitidos, depois da configuração.
 
 ## Rodar localmente
@@ -23,7 +23,7 @@ npx wrangler d1 migrations apply DB --local
 npm run dev -- --host 127.0.0.1
 ```
 
-Abrir o endereço local informado pelo Vite. Informar credencial de leitura para consultar e credencial de demonstração para avançar os cenários. Elas permanecem somente na memória da página; não são gravadas em URL, HTML, log ou localStorage. Sem bot, deixar credenciais Telegram vazias; o simulador continua disponível.
+Abrir o endereço local informado pelo Vite. Informar a credencial de leitura para consultar as fichas de respostas. Elas permanecem somente na memória da página; não são gravadas em URL, HTML, log ou localStorage. Sem bot, deixar credenciais Telegram vazias; testes e cenários técnicos pela API restrita continuam disponíveis.
 
 ```sh
 npm test

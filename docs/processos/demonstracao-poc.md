@@ -1,24 +1,24 @@
 # Demonstração da POC
 
-Roteiro de demonstração de 3–5 minutos. Fluxos exercitados nos testes; apresentação humana completa ainda não homologada. Usar [cenários fictícios](../referencias/exemplos/cenarios.json) e relógio simulado explícito.
+Atualizado em 24/10/2026. A demonstração de produto usa o bot do Telegram e a consulta da equipe, com dados fictícios. A consulta não tem botões de simulação.
 
-| Cena | O que mostrar | Critério |
-|---|---|---|
-| Data | Estudante A registra produto/prova e remarca | Contato antigo fica inválido |
-| Pós-prova | Avançar data e confirmar realização/aprovação | Resultado identificado como declarado |
-| Curso e simulados | Avaliação positiva do curso e crítica aos simulados | Dimensões e recursos separados |
-| Visão da equipe | Resultado e relato lado a lado | Aprovação não esconde oportunidade de melhoria |
-| Exceção curta | Estudante B aguarda resultado e não usou simulados | Pode avaliar curso; não gera nota negativa de simulado |
+## Roteiro
 
-Verificações adicionais: pausa impede novo contato programado; silêncio não vira reprovação; ausência não produz avaliação de aderência; correção não duplica tentativa.
+1. Iniciar uma tentativa no Telegram com /nova e informar a data fictícia da prova.
+2. Confirmar a data marcada ou identificá-la como pretendida. Remarcar por /data quando necessário.
+3. Após o vencimento combinado, responder se realizou a prova e informar o resultado.
+4. Avaliar o curso e os simulados separadamente; conteúdo, formato e dificuldade não são uma única nota.
+5. Deixar comentário opcional e conferir a confirmação de registro.
+6. Na consulta da equipe, carregar as respostas com a credencial de leitura. Cada ficha exibe uma tentativa: prova/resultado, curso, simulados e comentário, sem rolagem horizontal.
 
-O participante usará Telegram. Enquanto o bot exclusivo não existe, a tela da equipe oferece um simulador autenticado com os mesmos estados persistidos. Mostrar somente participantes e dados de demonstração; não precisa integrar plataforma acadêmica, executar campanha ou operar com alunos reais.
+O teste real do ciclo principal já foi executado. Para simular a passagem dos dias nesse teste, apenas o vencimento de uma tentativa fictícia foi antecipado por operação técnica controlada; o cron publicado fez o disparo. Isso não altera o relógio global e não deve ser confundido com esperar dias reais. Evidência: [implementação e testes](../levantamentos/2026-10-24-implementacao-poc.md).
 
-## Controles disponíveis no simulador
+## Consulta da equipe
 
-- Avançar A/B/C executa um passo fechado por clique. No passo de aguardo, avança somente o relógio desse participante fictício.
-- A: depois dos três primeiros avanços, usar Remarcar A e avançar novamente a data/confirmação antes de seguir a pesquisa.
-- B: completar a pesquisa pendente; Corrigir resultado B abre a pergunta e o segundo clique confirma aprovação sem apagar feedback.
-- C: após três avanços, Pausar C e Avançar C mantêm o aguardo. Retomar C e avançar levam à pergunta de realização; o próximo avanço registra ausência sem pesquisa. Nova tentativa C cria uma tentativa separada; Cancelar C então registra cancelamento sem apagar a ausência anterior.
-- No chat, confirmar uma data como pretendida a mantém separada de uma prova marcada e não programa contato pós-prova.
-- A consulta mostra contagens com denominadores; não uso e pendência são apresentados separadamente.
+As fichas são ordenadas das mais recentes às anteriores. A origem distingue conversa pelo Telegram de exemplos anteriores. Tentativas sem realização, ausência e cancelamento não aparecem como avaliações negativas. Não uso, não resposta e incapacidade de avaliar permanecem separados.
+
+O resumo mostra realização, resultados conhecidos e pendentes com denominadores. Indicadores adicionais do curso e dos simulados ficam em uma seção recolhível. Não há oferta comercial no bot.
+
+## Testes técnicos
+
+Os cenários enumerados A/B/C e suas ações continuam disponíveis na API restrita para testes automatizados, sem interface na consulta da equipe. Eles não são uma etapa de trabalho da operação.

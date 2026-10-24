@@ -11,6 +11,11 @@ As mudanças relevantes seguem o formato Keep a Changelog. A implementação da 
 - Testes de domínio, SQL, HTTP, autorização, agenda e entrega incerta.
 - Datas marcadas/pretendidas/sem data, cenários A/B/C e indicadores com denominadores explícitos.
 
+### Changed
+
+- Consulta da equipe em fichas responsivas, com feedbacks e comentários sem rolagem horizontal.
+- Controles de simulação retirados da interface de consulta.
+
 ### Security
 
 - Segredos fora do Git, allowlist de participantes, callbacks assinados e acessos administrativos separados.
