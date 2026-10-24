@@ -4,14 +4,16 @@ Atualizado em 24/10/2026. A demonstração de produto usa o bot do Telegram e a 
 
 ## Roteiro
 
-1. Iniciar uma tentativa no Telegram com /nova e informar a data fictícia da prova.
-2. Confirmar a data marcada ou identificá-la como pretendida. Remarcar por /data quando necessário.
-3. Após o vencimento combinado, responder se realizou a prova e informar o resultado.
-4. Avaliar o curso e os simulados separadamente; conteúdo, formato e dificuldade não são uma única nota.
-5. Deixar comentário opcional e conferir a confirmação de registro.
-6. Na consulta da equipe, carregar as respostas com a credencial de leitura. Cada ficha exibe uma tentativa: prova/resultado, curso, simulados e comentário, sem rolagem horizontal.
+1. Abrir o bot autorizado e enviar **/teste**. Funciona também no primeiro contato.
+2. Informar uma data fictícia de hoje em diante no formato DD/MM/AAAA e confirmar que está marcada.
+3. O bot simula imediatamente a passagem da prova e pergunta se ela foi realizada, sem esperar D+1.
+4. Informar resultado e avaliar o curso e os simulados separadamente: conteúdo, formato e dificuldade.
+5. Deixar comentário opcional e consultar /resumo. Para repetir, enviar /teste.
+6. Na consulta da equipe, carregar as respostas com a credencial de leitura. A ficha aparece como **Modo de teste**, fora dos indicadores normais.
 
-O teste real do ciclo principal já foi executado. Para simular a passagem dos dias nesse teste, apenas o vencimento de uma tentativa fictícia foi antecipado por operação técnica controlada; o cron publicado fez o disparo. Isso não altera o relógio global e não deve ser confundido com esperar dias reais. Evidência: [implementação e testes](../levantamentos/2026-10-24-implementacao-poc.md).
+O teste é uma tentativa separada, preserva o histórico e não agenda contato futuro. Não altera o relógio nem datas no banco. Se houver prova normal confirmada em acompanhamento, /teste explica o conflito e preserva essa agenda; conclua a tentativa antes de testar. Uma data apenas pretendida não inicia o pós-prova, inclusive no teste.
+
+O fluxo normal continua disponível por /nova (ou /start no primeiro contato), com contato no D+1. O teste imediato valida o questionário e a gravação; a execução real do agendador é validada separadamente.
 
 ## Consulta da equipe
 

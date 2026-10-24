@@ -30,3 +30,7 @@ Todos os registros e eventos serão fictícios. O canal escolhido é Telegram, c
 A identificação do produto é necessária para entender a avaliação, mas um catálogo fictício é suficiente. Em operação real, combinar como identificar alunos/produtos e obter permissão de contato; isso não implica integrar progresso de aulas.
 
 O feedback é percepção declarada, não comprovação de equivalência objetiva nem de eficácia pedagógica. Resultado e avaliação permanecem independentes. Critérios detalhados nas [histórias](../referencias/historias-de-usuario.md).
+
+## Teste imediato pelo Telegram
+
+O comando /teste permite percorrer a coleta completa na hora: confirmar uma data fictícia marcada avança ao pós-prova, sem D+1 e sem operação técnica. A tentativa é identificada como teste e excluída dos indicadores regulares. /nova mantém o fluxo normal. Provas normais confirmadas em andamento são preservadas e bloqueiam a criação de teste até sua conclusão. A autorização do Telegram permanece a mesma.

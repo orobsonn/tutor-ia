@@ -20,3 +20,9 @@ test('metrics preserve eligibility, pending and non-use without treating unknown
  assert.equal(get('Simulados: dificuldade comparada / usuários')?.value,0);
  assert.equal(get('Simulados: não usaram / provas realizadas')?.value,1);
 });
+
+test('immediate test attempts do not enter regular indicators',()=>{
+ const base=createSurvey('demo','test');
+ const metrics=surveyMetrics([{...base,testMode:true,attendance:'performed',result:'approved'},base]);
+ assert.equal(metrics[0].value,0);assert.equal(metrics[0].total,1);
+});

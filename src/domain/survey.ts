@@ -25,6 +25,7 @@ export type Alignment = 'much' | 'partly' | 'little' | 'unknown';
 export type SimulationDifficulty = 'easier' | 'same' | 'harder' | 'unknown';
 
 export interface SurveyState {
+  testMode?: boolean; // Legacy attempts without this field use the normal schedule.
   participantId: string;
   attemptId: string;
   revision: number;
@@ -101,10 +102,11 @@ const COMMENT_BUTTONS: SurveyButton[] = [
   { text: 'Pular comentário', value: 'skip' },
 ];
 
-export function createSurvey(participantId: string, attemptId: string): SurveyState {
+export function createSurvey(participantId: string, attemptId: string, testMode = false): SurveyState {
   return {
     participantId,
     attemptId,
+    testMode,
     revision: 0,
     scheduleRevision: 0,
     step: 'date',
@@ -328,14 +330,16 @@ function handleDateConfirmation(
   }
   const examDate = state.candidateDate;
   const scheduled = update(state, {
-    step: 'scheduled',
+    step: state.testMode && value === 'confirm' ? 'attendance' : 'scheduled',
     examDate,
     candidateDate: null,
     examDateStatus: value === 'intended' ? 'intended' : 'scheduled',
-    dueAt: value === 'intended' ? null : dueAtForExamDate(examDate),
+    dueAt: state.testMode || value === 'intended' ? null : dueAtForExamDate(examDate),
     attendance: null,
     scheduleRevision: state.scheduleRevision + 1,
   });
+  if (state.testMode && value === 'confirm') return response(scheduled,
+    `🧪 Modo de teste · pós-prova imediato\n\nData fictícia: ${formatDate(examDate)}\nVamos imaginar que a prova já passou. Nenhum contato futuro foi agendado.\n\nVocê realizou a prova?`, ATTENDANCE_BUTTONS);
   return response(
     scheduled,
     value === 'intended' ? `📅 Data pretendida registrada\n\n${formatDate(examDate)}\n\nNenhum contato pós-prova foi agendado. Quando a prova estiver marcada, envie /data.` : `✅ Prova registrada\n\n📅 Data da prova: ${formatDate(examDate)}\n💬 Contato pós-prova: ${formatContact(scheduled.dueAt)} (horário de Fortaleza).\n\nSe a data mudar, use o botão abaixo ou envie /data.`,
@@ -344,6 +348,7 @@ function handleDateConfirmation(
 }
 
 function handleFollowup(state: SurveyState, now: Date): SurveyResponse {
+  if (state.testMode) return renderStep(state);
   if (state.paused) {
     return response(state, "⏸ Os contatos programados estão pausados.\n\nPara retomar, envie /retomar.");
   }

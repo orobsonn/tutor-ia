@@ -175,6 +175,7 @@ test('nova tentativa vira corrente e preserva a tentativa anterior no histórico
     participantId: next.participantId,
     eventId: 'new',
     expectedRevision: 0,
+    expectedAttemptId: previous.attemptId,
     state: next,
     response,
     demo: true,
@@ -380,4 +381,20 @@ test('due filtra o modo antes do limite para cenários demo não bloquearem Tele
     dueTelegram.map(({ state, demo }) => ({ participantId: state.participantId, demo })),
     [{ participantId: 'telegram-real', demo: false }],
   );
+});
+
+test('attempt identity prevents competing replacements at the same zero revision',async(t)=>{
+ const {db,store}=setup();t.after(()=>db.close());
+ const old=createSurvey('participant-cas','old');
+ await store.applyEvent({participantId:old.participantId,eventId:'seed',expectedRevision:null,state:old,response,demo:true});
+ const replace=(id:string)=>store.applyEvent({participantId:old.participantId,eventId:id,expectedRevision:0,expectedAttemptId:'old',state:createSurvey(old.participantId,id,true),response,demo:true});
+ assert.equal(await replace('first'),'applied');assert.equal(await replace('second'),'conflict');
+ assert.equal((await store.list()).length,2);
+});
+
+test('test attempts cannot enter the due queue even with a stale stored deadline',async(t)=>{
+ const {db,store}=setup();t.after(()=>db.close());
+ const state=scheduled('participant-test-queue','test-queue',{testMode:true});
+ await store.applyEvent({participantId:state.participantId,eventId:'seed',expectedRevision:null,state,response,demo:false});
+ assert.equal((await store.due('2030-01-01T00:00:00Z',20,false)).length,0);
 });

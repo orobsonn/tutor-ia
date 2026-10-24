@@ -51,6 +51,7 @@ export interface ApplyEventInput {
   participantId: string;
   eventId: string;
   expectedRevision: number | null;
+  expectedAttemptId?: string | null;
   state: SurveyState;
   response: Pick<SurveyResponse, 'message' | 'buttons'>;
   demo: boolean;
@@ -137,6 +138,7 @@ export class SurveyStore {
              AND attempt.attempt_id = current.attempt_id
             WHERE current.participant_id = ?
               AND attempt.revision = ?
+              AND current.attempt_id = ?
               AND (
                 (
                   current.attempt_id = ?
@@ -173,6 +175,7 @@ export class SurveyStore {
         input.expectedRevision,
         input.participantId,
         input.expectedRevision,
+        input.expectedAttemptId ?? input.state.attemptId,
         input.state.attemptId,
         input.state.revision,
         input.state.revision,
@@ -297,6 +300,7 @@ export class SurveyStore {
        AND current.attempt_id = attempt.attempt_id
       WHERE attempt.step = 'scheduled'
         AND attempt.paused = 0
+        AND COALESCE(json_extract(attempt.state_json, '$.testMode'), 0) = 0
         AND attempt.due_at IS NOT NULL
         AND attempt.due_at <= ?
         AND (? IS NULL OR attempt.demo = ?)

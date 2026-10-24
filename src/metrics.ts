@@ -2,6 +2,7 @@ import type { SurveyState } from './domain/survey.ts';
 
 // Each denominator describes eligibility; unknown and non-use are never negative ratings.
 export function surveyMetrics(records: SurveyState[]) {
+  records=records.filter(row=>!row.testMode);
   const performed=records.filter(row=>row.attendance==='performed');
   const courseUsers=performed.filter(row=>row.courseUsed===true);
   const simulationUsers=performed.filter(row=>row.simulationUsed===true);

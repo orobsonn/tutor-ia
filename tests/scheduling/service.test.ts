@@ -86,3 +86,39 @@ test('demo A remarca para outra data e invalida a agenda anterior',async(t)=>{
  const after=(await service.store.getCurrent('demo:A'))!.state;
  assert.notEqual(after.examDate,before.examDate);assert.notEqual(after.dueAt,before.dueAt);assert.ok(after.scheduleRevision>before.scheduleRevision);
 });
+
+test('self-service test completes immediately without scheduled contact and preserves attempts',async(t)=>{
+ const {db,service,input,sent}=setup();t.after(()=>db.close());
+ await input('/teste');
+ const initial=(await service.store.getCurrent('tg:1001'))!.state;
+ assert.equal(initial.testMode,true);
+ assert.match(sent[0].message,/Modo de teste/);
+ await input('02/11/2026');await input('confirm','choice');
+ const confirmed=(await service.store.getCurrent('tg:1001'))!.state;
+ assert.equal(confirmed.step,'attendance');assert.equal(confirmed.dueAt,null);
+ for(const value of ['yes','approved','yes','much','yes','partly','little','harder','skip'])await input(value,'choice');
+ assert.equal((await service.store.getCurrent('tg:1001'))!.state.step,'done');
+ await service.tick(new Date('2027-01-01T13:00:00Z'));
+ assert.equal(sent.filter(row=>row.kind==='followup').length,0);
+ const event={participantId:'tg:1001',eventId:'same-test-command',event:{kind:'text' as const,value:'/teste'},demo:false,now};
+ await service.handleAuthorizedInput(event);const count=(await service.store.list()).length;
+ await service.handleAuthorizedInput(event);assert.equal((await service.store.list()).length,count);
+ await input('/nova');assert.equal((await service.store.getCurrent('tg:1001'))!.state.testMode,false);
+ assert.ok((await service.store.list()).some(row=>row.state.attemptId===initial.attemptId));
+});
+
+test('test command preserves a live scheduled attempt and explains the conflict',async(t)=>{
+ const {db,input,service,sent}=setup();t.after(()=>db.close());await schedule(input);
+ const before=(await service.store.getCurrent('tg:1001'))!.state;
+ await input('/teste');assert.deepEqual((await service.store.getCurrent('tg:1001'))!.state,before);
+ assert.match(sent.at(-1)!.message,/agenda foi preservada/);
+});
+
+test('callback from replaced attempt is stale even when revisions match',async(t)=>{
+ const {db,service,input}=setup();t.after(()=>db.close());await input('/teste');
+ const old=(await service.store.getCurrent('tg:1001'))!.state;
+ await input('/teste');
+ const reply=await service.handleAuthorizedInput({participantId:'tg:1001',eventId:'old-callback',event:{kind:'choice',value:'unknown'},demo:false,now,expectedRevision:old.revision,expectedAttemptId:old.attemptId});
+ assert.equal(reply.status,'stale');
+ assert.equal((await service.store.getCurrent('tg:1001'))!.state.step,'date');
+});

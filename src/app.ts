@@ -54,18 +54,19 @@ export function createApp(env:POCEnv,sender:Sender=telegramSender(env.TELEGRAM_B
       const participantId=`tg:${incoming.chat.id}`;
       let event:{kind:'text'|'choice',value:string};
       let expectedRevision:number|undefined;
+      let expectedAttemptId:string|undefined;
       if(callback) {
         const current=await service.store.getCurrent(participantId);
         if(!current || !callback.data) return {method:'answerCallbackQuery',callback_query_id:callback.id,text:'Use /start para continuar.'};
         const value=await verifyCallback(callback.data,env.TELEGRAM_WEBHOOK_SECRET_TOKEN!,participantId,current.state.attemptId,current.state.revision);
         if(value===null) return {method:'answerCallbackQuery',callback_query_id:callback.id,text:'Esta pergunta foi atualizada. Use /start.'};
-        expectedRevision=current.state.revision;event={kind:'choice',value};
+        expectedAttemptId=current.state.attemptId;expectedRevision=current.state.revision;event={kind:'choice',value};
       } else {
         const text='text' in incoming?incoming.text:undefined;
         if(typeof text!=='string' || text.length>1200) return {ok:true};
         event={kind:'text',value:text.trim()};
       }
-      const result=await service.handleAuthorizedInput({participantId,eventId:`telegram:${update.update_id}`,event,demo:false,now:new Date(),expectedRevision});
+      const result=await service.handleAuthorizedInput({participantId,eventId:`telegram:${update.update_id}`,event,demo:false,now:new Date(),expectedRevision,expectedAttemptId});
       return result.status==='conflict'?new Response('Retry later',{status:503}):callback?{method:'answerCallbackQuery',callback_query_id:callback.id}:{ok:true};
     }});
     app.route('/channels/telegram',channel.route());

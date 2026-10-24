@@ -5,6 +5,13 @@ As mudanças relevantes seguem o formato Keep a Changelog. A implementação da 
 ## [Unreleased]
 
 ### Added
+- Modo /teste no Telegram com pós-prova imediato, histórico separado e identificação na consulta, sem contatos futuros ou inclusão nos indicadores regulares.
+
+### Fixed
+- Comparação da identidade da tentativa ao substituir o acompanhamento, impedindo substituições concorrentes com a mesma revisão.
+
+
+### Added
 
 - PRD, harness vendorizado e implementação inicial da POC Telegram/Flue/Cloudflare.
 - Pesquisa determinística, persistência, agenda/outbox, consulta protegida e simulador.

@@ -64,3 +64,7 @@ getMe, setWebhook, /start, callback assinado e persistência iniciais foram veri
 O bot aceita somente IDs numéricos privados autorizados em TELEGRAM_ALLOWED_USER_IDS. Identificar a conta exata do avaliador antes de acrescentá-la à configuração privada, preservando as já autorizadas. Um @ pode ajudar a localizar a conta, mas não substitui o ID na regra de acesso. Não abrir o bot a todos para contornar essa identificação.
 
 Para consultar a tela, compartilhar privadamente o endereço e somente a credencial de leitura. Não é preciso conceder acesso à conta Cloudflare ou ao repositório. Para testar o pós-prova imediatamente, antecipar de forma controlada apenas a tentativa fictícia correspondente; o fluxo normal aguarda D+1.
+
+## Teste imediato pelo Telegram
+
+O comando /teste permite percorrer a coleta completa na hora: confirmar uma data fictícia marcada avança ao pós-prova, sem D+1 e sem operação técnica. A tentativa é identificada como teste e excluída dos indicadores regulares. /nova mantém o fluxo normal. Provas normais confirmadas em andamento são preservadas e bloqueiam a criação de teste até sua conclusão. A autorização do Telegram permanece a mesma.

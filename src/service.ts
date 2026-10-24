@@ -30,21 +30,25 @@ export class SurveyService {
   readonly sender:Sender;
   constructor(store:SurveyStore,sender:Sender) {this.store=store;this.sender=sender;}
 
-  async handleAuthorizedInput(input:{participantId:string,eventId:string,event:SurveyEvent,demo:boolean,now:Date,expectedRevision?:number,deferFlush?:boolean}) {
+  async handleAuthorizedInput(input:{participantId:string,eventId:string,event:SurveyEvent,demo:boolean,now:Date,expectedRevision?:number,expectedAttemptId?:string,deferFlush?:boolean}) {
     const current=await this.store.getCurrent(input.participantId);
     if(current && current.demo !== input.demo) throw new Error('participant mode mismatch');
     if(input.expectedRevision !== undefined && current?.state.revision!==input.expectedRevision) return {status:'stale' as const};
-    let state=current?.state??createSurvey(input.participantId,crypto.randomUUID());
-    if(!current && !(input.event.kind==='text' && input.event.value==='/start')) return {status:'start_required' as const};
-    let response:SurveyResponse;
-    if(input.event.kind==='text' && input.event.value==='/nova' && current) {
-      state=createSurvey(input.participantId,crypto.randomUUID());
-      response=transition(state,{kind:'text',value:'/start'},input.now);
-    } else response=transition(state,input.event,input.now);
-    if(!current || (input.event.kind==='text' && input.event.value==='/nova')) response={...response,message:'Olá! Vou acompanhar sua prova e ouvir como foi sua preparação.\n\n🧪 Demonstração com dados fictícios\nCurso: Curso Alfa\nProva: Certificação Alfa\n\n'+response.message};
+    if(input.expectedAttemptId !== undefined && current?.state.attemptId!==input.expectedAttemptId) return {status:'stale' as const};
+    const command=input.event.kind==='text' ? input.event.value.trim().toLowerCase() : '';
+    const startsTest=command==='/teste';
+    const startsNormal=command==='/nova';
+    if(!current && !['/start','/teste'].includes(command)) return {status:'start_required' as const};
+    // A test must not replace a live normal attempt or its scheduled follow-up.
+    const blocked=startsTest && current && !current.state.testMode && current.state.step!=='done' && current.state.examDateStatus==='scheduled';
+    let state=current?.state??createSurvey(input.participantId,crypto.randomUUID(),startsTest);
+    if(!blocked && (startsTest || startsNormal)) state=createSurvey(input.participantId,crypto.randomUUID(),startsTest);
+    let response=transition(state,startsTest || startsNormal ? {kind:'text',value:'/start'} : input.event,input.now);
+    if(blocked) response={...response,message:'📅 Você já tem uma prova em acompanhamento. Conclua essa tentativa antes de iniciar /teste. Sua agenda foi preservada.\n\n'+response.message};
+    if(!blocked && (!current || startsTest || startsNormal)) response={...response,message:'Olá! Vou acompanhar sua prova e ouvir como foi sua preparação.\n\n🧪 Demonstração com dados fictícios\nCurso: Curso Alfa\nProva: Certificação Alfa\n\n'+(startsTest?'🧪 Modo de teste\nAo confirmar uma data marcada, você responde o pós-prova na hora. Use uma data fictícia de hoje em diante.\n\n':'Para experimentar tudo agora, envie /teste.\n\n')+response.message};
     const status=await this.store.applyEvent({
       participantId:input.participantId,eventId:input.eventId,
-      expectedRevision:current?.state.revision??null,state:response.state,response,demo:input.demo,
+      expectedRevision:current?.state.revision??null,expectedAttemptId:current?.state.attemptId??null,state:response.state,response,demo:input.demo,
       kind:input.event.kind==='followup'?'followup':'reply',
     });
     if(status==='applied' && !input.deferFlush) await this.flush();
@@ -56,7 +60,7 @@ export class SurveyService {
       const claimed=await this.store.claim(pending.id);
       if(!claimed) continue;
       const current=await this.store.getCurrent(claimed.participantId);
-      if(!current || current.state.attemptId!==claimed.attemptId || current.state.revision!==claimed.revision || current.state.scheduleRevision!==claimed.scheduleRevision || (claimed.kind==='followup' && current.state.paused)) {
+      if(!current || current.state.attemptId!==claimed.attemptId || current.state.revision!==claimed.revision || current.state.scheduleRevision!==claimed.scheduleRevision || (claimed.kind==='followup' && (current.state.paused || current.state.testMode))) {
         await this.store.markDelivery(claimed.id,'canceled');continue;
       }
       try {
