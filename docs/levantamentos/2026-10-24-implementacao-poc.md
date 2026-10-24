@@ -101,3 +101,5 @@ Comprovação visual e identificadores técnicos permanecem em arquivo privado. 
 A pedido do responsável de produto, a tabela larga foi substituída por fichas responsivas. Resultado/data/realização, curso, dimensões dos simulados e comentário são apresentados em blocos legíveis. Indicadores detalhados ficam recolhidos; os denominadores e as distinções de não uso/ausência de resposta foram preservados.
 
 A área “Simular conversa com aluno” e sua credencial/controles foram retiradas da consulta. A API técnica restrita permanece para os testes existentes. O bot continua determinístico, sem IA generativa; essa alteração é de apresentação da consulta.
+
+Verificação desta revisão: 44/44 testes, tipos, build e CI aprovados. Inspeção de layout em 600 e 390 pixels confirmou scrollWidth igual a clientWidth, inclusive nas fichas. Após publicar, a consulta carregou as seis tentativas preservadas; a ficha do teste completo pelo Telegram exibiu resultado, curso, três dimensões dos simulados e comentário. A página publicada não contém tabela nem chamadas à API de simulação, e a configuração do Telegram foi preservada.
