@@ -111,3 +111,11 @@ Mensagens do Telegram reorganizadas em blocos curtos, com perguntas identificada
 A liberação de um novo avaliador depende da identificação exata de sua conta. A allowlist e a separação entre leitura e mutação não foram alteradas nesta revisão.
 
 Verificação desta revisão: 47 testes, tipos, build e CI aprovados. O resumo foi solicitado no Telegram real e recebido com blocos em português, data brasileira e avaliações preservadas. Um avaliador foi identificado pelo contato exato já salvo no Telegram; seu ID numérico foi acrescentado à configuração privada, preservando o responsável. Não houve abertura pública do bot nem mensagem enviada ao avaliador. A identidade do avaliador e a credencial de consulta ficaram fora do Git; o início de teste por essa nova conta ainda depende do próprio avaliador.
+
+## Teste imediato autônomo
+
+Publicado o comando `/teste`, que cria tentativa identificada e abre o pós-prova imediatamente após confirmar data fictícia marcada. O fluxo normal D+1 permanece separado. Tentativas de teste não entram na fila de vencimentos nem nos indicadores regulares; o histórico é preservado. Prova normal confirmada em andamento bloqueia a troca para teste e mantém a pergunta atual disponível.
+
+Validação em 24/10/2026: 53 testes automatizados, tipagem, build, CI e revisão adversarial passaram. No Telegram publicado, um participante autorizado executou `/teste`, informou data futura, confirmou e recebeu imediatamente a pergunta de realização. Foram registrados aprovação, uso e aderência do curso, conteúdo/formato/dificuldade dos simulados e comentário. A consulta autenticada confirmou tentativa encerrada, `testMode=true`, `dueAt=null` e exclusão dos indicadores normais. Não houve antecipação manual de prazo nem alteração de relógio nessa execução. Evidências detalhadas e capturas permanecem privadas fora do Git.
+
+A revisão também reforçou a comparação da identidade da tentativa junto à revisão, tanto na persistência quanto no intervalo entre validação e aplicação de callbacks. Um envio externo já iniciado permanece sujeito à janela de concorrência do provedor; o novo modo não cria agenda futura.
