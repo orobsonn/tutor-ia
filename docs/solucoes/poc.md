@@ -1,6 +1,6 @@
 # POC Telegram — funcionamento e execução
 
-Atualizado em 24/10/2026. Código implementado e ciclo demonstrado no runtime local workerd com D1 local. Deploy remoto e cenários simulados foram verificados; o início real do Telegram e um callback também foram verificados, conforme registrado no [estado do projeto](../estado-atual/projeto.md).
+Atualizado em 24/10/2026. Código implementado e ciclo demonstrado no runtime local workerd com D1 local. Deploy remoto e cenários simulados foram verificados; o ciclo principal real do Telegram também foi verificado com vencimento fictício antecipado, conforme registrado no [estado do projeto](../estado-atual/projeto.md).
 
 ## Implementado
 
@@ -57,4 +57,4 @@ Outbox pending → sending → sent/simulated/unknown. Pausa/remarcação invali
 
 A recuperação de sending antigo ocorre após dois minutos, sem reenvio. Jobs simulados não concorrem com o lote do Telegram. A leitura da equipe é intencionalmente simples e adequada à pequena demonstração; não é painel multicliente ou integração CRM.
 
-getMe, setWebhook, /start, callback assinado e persistência iniciais foram verificados no bot exclusivo. O ciclo pós-prova completo pelo Telegram ainda não foi executado. A revisão final e a evidência datada indicam o que efetivamente foi verificado.
+getMe, setWebhook, /start, callback assinado e persistência iniciais foram verificados no bot exclusivo. O ciclo principal pós-prova completo também foi executado, usando o cron publicado e antecipação isolada do vencimento de uma tentativa fictícia. A revisão final e a evidência datada indicam o que efetivamente foi verificado.

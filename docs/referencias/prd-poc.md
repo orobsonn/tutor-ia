@@ -17,7 +17,7 @@ Sucesso da POC: um participante autorizado, representando aluno fictício, compl
 - Não depender de API de aulas, progresso ou banco de questões.
 - Repositório e documentação públicos e genéricos; credenciais, identidades de chats/contas e registros coletados ficam fora do Git.
 
-Atualização de 24/10/2026: bot exclusivo criado e conectado; /start e callback assinado verificados com persistência. O ciclo pós-prova completo pelo Telegram real ainda precisa ser executado. A implementação/simulação foi construída antes da disponibilização do bot.
+Atualização de 24/10/2026: bot exclusivo criado e conectado; /start e callback assinado verificados com persistência. O ciclo principal pós-prova também foi executado pelo Telegram real com respostas fictícias, antecipando apenas o vencimento da tentativa de teste; ver evidência datada. A implementação/simulação foi construída antes da disponibilização do bot.
 
 ## 3. Usuários e entrada
 

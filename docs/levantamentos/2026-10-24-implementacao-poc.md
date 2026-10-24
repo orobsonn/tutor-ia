@@ -1,6 +1,6 @@
 # Implementação e evidência — 24/10/2026
 
-Status: implementação revisada e publicada em ambiente de demonstração; Telegram real pendente.
+Status: implementação revisada e publicada; ciclo principal verificado no Telegram real com dados fictícios e vencimento isolado antecipado. Homologação humana pendente.
 
 ## Contrato e decisões
 
@@ -24,7 +24,7 @@ A revisão adversarial anterior ao código resultou em: allowlist privada além 
 
 O teste real de evento scheduled no runtime local retornou outcome=exception: o Flue não exporta handlers não HTTP declarados apenas em app.ts. O cron foi movido para src/cloudflare.ts, ponto de extensão nativo do framework; revalidar o evento no runtime e manter teste desse entrypoint.
 
-## Limites
+## Limites registrados antes da conexão do bot
 
 Não é E2E do Telegram: token/bot inexistentes. Não há efeito externo de envio na simulação, não há dados acadêmicos reais e não foi verificada eficácia pedagógica. A evidência remota abaixo se refere ao simulador autenticado, sem entrega real de mensagens.
 
@@ -72,3 +72,26 @@ Com autorização do responsável, o bot exclusivo foi criado no BotFather pelo 
 O participante iniciou /start no Telegram real. O Worker respondeu identificando Curso Alfa/Certificação Alfa e os dados fictícios. O botão assinado “Ainda não tenho data” foi acionado pelo chat; a consulta autenticada confirmou uma tentativa em transporte Telegram, estado sem data e sem contato agendado. Entregas reais desse teste têm status sent; webhook sem pendências ou erro. Isso comprova ingresso, resposta, callback e persistência iniciais — não o ciclo pós-prova completo.
 
 A tela da equipe passou a chamar o bloco de demonstração “Simular conversa com aluno”, explicando o efeito dos cliques e distinguindo esses controles da rotina operacional.
+
+## Teste completo do ciclo principal pelo Telegram — 24/10/2026
+
+Solicitado explicitamente pelo responsável. Foi criada uma tentativa fictícia separada via /nova, informada a data 25/10/2026 e confirmada como marcada pelos botões reais do Telegram.
+
+Para simular a passagem dos dias, somente due_at e dueAt do JSON dessa tentativa foram antecipados, com condição de participante, tentativa, revisão, estado e conteúdo anterior exatos. A alteração atingiu uma única linha. Nenhum relógio global, configuração do cron, autorização ou outra tentativa foi modificado. O vencimento original e o snapshot anterior ficaram preservados em evidência privada. Isso é aceleração de fixture de teste, não comprovação de que dias reais transcorreram.
+
+O cron publicado enviou “Você realizou a prova prevista?” às 12h15 no fuso America/Fortaleza. Todos os passos seguintes ocorreram pelo Chrome/Telegram, com os botões reais assinados e o comentário enviado pelo chat:
+
+| Campo | Resposta fictícia confirmada no registro persistido |
+|---|---|
+| Realização | Realizou |
+| Resultado | Aprovado; recebeu parabéns sem oferta |
+| Curso | Utilizou; conteúdo correspondeu muito |
+| Simulados — uso/conteúdo | Utilizou; correspondeu em parte |
+| Simulados — formato | Pouco parecido |
+| Dificuldade relativa | Prova mais difícil que os simulados |
+| Comentário | Relato identificado como teste fictício sobre conteúdo, formato e dificuldade |
+| Encerramento | Estado done; mensagem “Respostas registradas. Obrigado!” |
+
+A consulta autenticada foi relida e comparada campo a campo com as respostas. Consulta direta ao D1 confirmou exatamente um followup sent e doze respostas reply sent nessa tentativa. Webhook sem pendências e sem erro. A tentativa finalizada não é elegível para novo contato agendado.
+
+Comprovação visual e identificadores técnicos permanecem em arquivo privado. Não houve alteração no código da aplicação nem novo deploy para esse teste. O resultado valida o caminho principal completo com transporte real; os casos alternativos têm a evidência simulada/automatizada já descrita, sem alegar que todos foram repetidos no Telegram.

@@ -2,7 +2,7 @@
 
 Acompanhamento de provas e coleta de feedback sobre a preparação oferecida por cursos e simulados.
 
-**Estado em 24/10/2026:** POC implementada e publicada em ambiente exclusivo de demonstração na Cloudflare; cenários fictícios validados por HTTP com persistência. Bot Telegram conectado com início de conversa e botão verificados; ciclo pós-prova completo e homologação humana ainda pendentes. Este repositório é público e contém documentação genérica, sem registros de alunos, conversas ou documentos de organizações.
+**Estado em 24/10/2026:** POC implementada e publicada em ambiente exclusivo de demonstração na Cloudflare; cenários fictícios validados por HTTP com persistência. Ciclo principal completo verificado no Telegram real com respostas fictícias e vencimento de teste antecipado; homologação humana ainda pendente. Este repositório é público e contém documentação genérica, sem registros de alunos, conversas ou documentos de organizações.
 
 ## Comece pela pergunta
 
