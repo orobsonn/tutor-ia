@@ -18,3 +18,10 @@ originais/
 *.mp3
 *.ogg
 *.wav
+
+.dev.vars
+.dev.vars.*
+!.dev.vars.example
+.flue/
+.flue-vite/
+.flue-vite.wrangler.jsonc

@@ -1,0 +1,3 @@
+# Codex Harness — local receipts and version cache, never commit
+audit/
+.harness-version-check-cache

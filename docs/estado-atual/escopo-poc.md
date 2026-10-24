@@ -25,7 +25,7 @@ Planejamento de estudo, acompanhamento de progresso, recuperação por inativida
 
 ## Dependências e limites
 
-Todos os registros e eventos serão fictícios. O canal pode ser Telegram ou uma interface de demonstração; escolha ainda pendente. Datas podem avançar em relógio simulado, sinalizado como tal. Não é necessário consumir API acadêmica ou gabarito de simulado.
+Todos os registros e eventos serão fictícios. O canal escolhido é Telegram, com Flue na Cloudflare. Simulador local permite desenvolver antes da criação do bot. Datas podem avançar em relógio simulado, sinalizado como tal. Não é necessário consumir API acadêmica ou gabarito de simulado.
 
 A identificação do produto é necessária para entender a avaliação, mas um catálogo fictício é suficiente. Em operação real, combinar como identificar alunos/produtos e obter permissão de contato; isso não implica integrar progresso de aulas.
 

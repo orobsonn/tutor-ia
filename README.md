@@ -2,12 +2,13 @@
 
 Acompanhamento de provas e coleta de feedback sobre a preparação oferecida por cursos e simulados.
 
-**Estado em 24/10/2026:** recorte de produto e histórias definidos; implementação da prova de conceito (POC) ainda não iniciada. A primeira demonstração usará somente dados fictícios. Este repositório é público e contém documentação genérica, sem registros de alunos, conversas ou documentos de organizações.
+**Estado em 24/10/2026:** recorte de produto e histórias definidos; PRD consolidado e implementação da prova de conceito (POC) iniciada, sem aceite executável ainda. A primeira demonstração usará somente dados fictícios. Este repositório é público e contém documentação genérica, sem registros de alunos, conversas ou documentos de organizações.
 
 ## Comece pela pergunta
 
 | Sua pergunta | Leia |
 |---|---|
+| Qual é o documento de requisitos? | [PRD da POC](docs/referencias/prd-poc.md) |
 | O que vamos demonstrar agora? | [Escopo vigente da POC](docs/estado-atual/escopo-poc.md) |
 | Como o recorte atual se compara à visão futura? | [Atual × visão-alvo](docs/estado-atual/escopo-atual-e-visao-alvo.md) |
 | Quais são as histórias e os critérios de aceite? | [Histórias de usuário](docs/referencias/historias-de-usuario.md) |
@@ -33,4 +34,4 @@ Acompanhamento de provas e coleta de feedback sobre a preparação oferecida por
 
 A POC pergunta a data da prova, faz contato depois, registra realização/resultado e coleta a percepção do aluno sobre a aderência do curso e dos simulados. Ela não compara objetivamente questões de provas e não promete aprovação.
 
-Ainda não há aplicativo executável, canal conectado, banco provisionado ou comandos de instalação. A construção começa depois da organização documental; nenhuma stack foi escolhida aqui. Regras de manutenção: [AGENTS.md](AGENTS.md). Mudanças: [CHANGELOG.md](CHANGELOG.md).
+Ainda não há aplicativo executável, canal conectado, banco provisionado ou comandos de instalação. A construção usa Telegram, Flue e Cloudflare; o bot exclusivo ainda não foi criado. Regras de manutenção: [AGENTS.md](AGENTS.md). Mudanças: [CHANGELOG.md](CHANGELOG.md).

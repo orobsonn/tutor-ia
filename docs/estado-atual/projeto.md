@@ -6,11 +6,11 @@ Atualizado em 24/10/2026.
 |---|---|
 | Direção de produto | Recorte adotado: prova, resultado e feedback de aderência |
 | Documentação | Histórias, limites, roteiro e decisões registrados |
-| POC executável | Ainda não implementada |
+| POC executável | Implementação iniciada; aceite executável pendente |
 | Dados da demonstração | Exemplos fictícios documentados; não há banco provisionado |
-| Canal | Não escolhido nem conectado; Telegram ou interface própria são possibilidades |
+| Canal | Telegram escolhido; bot exclusivo ainda não criado |
 | Integrações acadêmicas | Fora da POC; desnecessárias para o recorte atual |
 | Homologação | Demonstração ainda não realizada |
 | Produção | Não iniciada |
 
-Próxima etapa: resolver [pendências da POC](../backlog/perguntas-em-aberto.md), fazer onboarding do harness exigido pelo operador e preparar a implementação. A autorização de construção não constitui escolha de arquitetura ou autorização para contatar alunos reais.
+PRD consolidado e goal de implementação ativo. Harness Codex v3.10.2 instalado. Próxima etapa: executar o [plano](../processos/plano-implementacao-poc.md), com testes simulados enquanto não houver bot. A autorização de construção não constitui escolha de arquitetura ou autorização para contatar alunos reais.
