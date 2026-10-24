@@ -4,11 +4,11 @@ Atualizado em 24/10/2026. Código implementado e ciclo demonstrado no runtime lo
 
 ## Implementado
 
-- Pesquisa guiada, sem LLM no caminho crítico, com datas, confirmação/remarcação, realização, resultado, curso e simulados.
+- Pesquisa guiada, sem LLM no caminho crítico, com datas marcadas/pretendidas/ausentes, confirmação/remarcação, realização, resultado, curso e simulados.
 - Flue 2.3.0 integra o ingresso verificado do Telegram e o build Cloudflare. Não há agente autônomo ou router de conversa público; não foi adicionada inferência só para preencher formulário.
 - Persistência de tentativas, eventos e outbox em D1; conflito de revisão e repetição de update não sobrescrevem estado.
 - Contato ilustrativo D+1 às 10h America/Fortaleza; agenda processada por cron a cada cinco minutos, sem modificar relógio global.
-- Consulta da equipe e simulador de cenários A/B com segredos distintos.
+- Consulta da equipe e simulador de cenários A/B/C com segredos distintos.
 - Sender simulado para cenários; sender Telegram exclusivo para participantes permitidos, depois da configuração.
 
 ## Rodar localmente
@@ -47,7 +47,7 @@ Comandos: /start, /data, /pausar, /retomar, /cancelar, /resultado, /resumo e /no
 - `GET /`: página sem dados/credenciais embutidos.
 - `GET /health`: saúde básica; não é teste completo de persistência.
 - `GET /api/records`: Authorization Bearer com OPERATOR_READ_TOKEN; lista saneada, sem expor IDs de chat.
-- `POST /api/demo`: Authorization Bearer com OPERATOR_DEMO_TOKEN; cenário A/B e ação enumerada next/reschedule/pause/resume/cancel; sem parâmetros de timestamp ou participante livres.
+- `POST /api/demo`: Authorization Bearer com OPERATOR_DEMO_TOKEN; cenário A/B/C e ação enumerada next/reschedule/pause/resume/cancel/absent/correct/new; sem parâmetros de timestamp ou participante livres.
 
 Todos os exemplos acadêmicos são fictícios. A flag interna de modo distingue transporte simulado de Telegram; mesmo no Telegram, produto/certificação desta POC continuam fictícios. O operador não deve inserir dados acadêmicos reais nesta etapa.
 

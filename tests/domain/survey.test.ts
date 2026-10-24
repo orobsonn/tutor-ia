@@ -46,7 +46,7 @@ test('percorre o questionário completo e agenda D+1 às 10h em America/Fortalez
   let response = send(createSurvey('participant-demo', 'attempt-demo'), 'text', EXAM_DATE);
   assert.equal(response.state.step, 'confirm_date');
   assert.equal(response.state.candidateDate, EXAM_DATE);
-  assert.deepEqual(response.buttons.map((button) => button.value), ['confirm', 'no']);
+  assert.deepEqual(response.buttons.map((button) => button.value), ['confirm', 'intended', 'no']);
 
   response = send(response.state, 'choice', 'confirm');
   assert.equal(response.state.step, 'scheduled');
@@ -285,4 +285,28 @@ test('oferece escolhas significativas para ausência de data e cancelamento', ()
   const summary = send(cancelled.state, 'text', '/resumo');
   assert.match(summary.message, /cancel/i);
   assert.equal(summary.state.revision, cancelled.state.revision);
+});
+
+test('late confirmation cannot schedule an expired candidate date',()=>{
+ const proposed=send(createSurvey('demo','late'),'text','2026-10-24').state;
+ const result=send(proposed,'choice','confirm',new Date('2026-10-26T15:00:00Z'));
+ assert.equal(result.state.step,'date');
+ assert.equal(result.state.dueAt,null);
+});
+
+test('intended date stays distinct from scheduled and undated without scheduling a contact',()=>{
+ const base=createSurvey('demo','intended');
+ const candidate=send(base,'text',EXAM_DATE).state;
+ const intended=send(candidate,'choice','intended').state;
+ assert.equal(intended.examDateStatus,'intended');
+ assert.equal(intended.examDate,EXAM_DATE);
+ assert.equal(intended.dueAt,null);
+ assert.equal(send(intended,'followup','',DUE_AT).state.step,'scheduled');
+ const reopened=send(intended,'text','/data').state;
+ const marked=send(send(reopened,'text',EXAM_DATE).state,'choice','confirm').state;
+ assert.equal(marked.examDateStatus,'scheduled');
+ assert.ok(marked.dueAt);
+ const undated=send(base,'choice','unknown').state;
+ assert.equal(undated.examDateStatus,'undated');
+ assert.equal(undated.examDate,null);
 });

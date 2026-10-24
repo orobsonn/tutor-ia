@@ -3,14 +3,16 @@ import { createSurvey, transition } from './domain/survey.ts';
 import type { SurveyEvent, SurveyResponse, SurveyState } from './domain/survey.ts';
 import { SurveyStore } from './storage.ts';
 import type { Outbox } from './storage.ts';
-import { callbackToken } from './auth.ts';
+import { allowedTelegramUser, callbackToken } from './auth.ts';
 
-export type DeliveryReceipt = {status: 'sent' | 'simulated' | 'unknown'; messageId?: string};
+export type DeliveryReceipt = {status: 'sent' | 'simulated' | 'unknown' | 'canceled'; messageId?: string};
 export interface Sender {send(message:Outbox):Promise<DeliveryReceipt>}
-export function telegramSender(token:string|undefined,webhookSecret:string|undefined):Sender {
+export function telegramSender(token:string|undefined,webhookSecret:string|undefined,allowlist:string|undefined):Sender {
   return {async send(message) {
     if(message.demo) return {status:'simulated',messageId:`demo:${message.id}`};
     if(!token || !webhookSecret || !/^tg:\d+$/.test(message.participantId)) return {status:'unknown'};
+    const id=Number(message.participantId.slice(3));
+    if(!allowedTelegramUser(id,id,'private',allowlist)) return {status:'canceled'};
     const keyboard=await Promise.all(message.buttons.map(async button=>[{
       text:button.text,
       callback_data:await callbackToken(webhookSecret,message.participantId,message.attemptId,message.revision,button.value),
@@ -28,7 +30,7 @@ export class SurveyService {
   readonly sender:Sender;
   constructor(store:SurveyStore,sender:Sender) {this.store=store;this.sender=sender;}
 
-  async handleAuthorizedInput(input:{participantId:string,eventId:string,event:SurveyEvent,demo:boolean,now:Date,expectedRevision?:number}) {
+  async handleAuthorizedInput(input:{participantId:string,eventId:string,event:SurveyEvent,demo:boolean,now:Date,expectedRevision?:number,deferFlush?:boolean}) {
     const current=await this.store.getCurrent(input.participantId);
     if(current && current.demo !== input.demo) throw new Error('participant mode mismatch');
     if(input.expectedRevision !== undefined && current?.state.revision!==input.expectedRevision) return {status:'stale' as const};
@@ -45,7 +47,7 @@ export class SurveyService {
       expectedRevision:current?.state.revision??null,state:response.state,response,demo:input.demo,
       kind:input.event.kind==='followup'?'followup':'reply',
     });
-    if(status==='applied') await this.flush();
+    if(status==='applied' && !input.deferFlush) await this.flush();
     return {status,state:response.state,message:response.message};
   }
 
@@ -69,25 +71,28 @@ export class SurveyService {
     for(const row of await this.store.due(now.toISOString(),20,false)) {
       // Demo time advances only through an authenticated scenario action.
       if(row.demo) continue;
-      await this.handleAuthorizedInput({participantId:row.state.participantId,eventId:`followup:${row.state.attemptId}:${row.state.scheduleRevision}`,event:{kind:'followup'},demo:false,now,expectedRevision:row.state.revision});
+      await this.handleAuthorizedInput({participantId:row.state.participantId,eventId:`followup:${row.state.attemptId}:${row.state.scheduleRevision}`,event:{kind:'followup'},demo:false,now,expectedRevision:row.state.revision,deferFlush:true});
     }
     await this.flush();
   }
 }
 
-export type DemoAction='next'|'reschedule'|'pause'|'resume'|'cancel';
-export function validDemoRequest(value:unknown):value is {scenario:'A'|'B',action:DemoAction} {
+export type DemoAction='next'|'reschedule'|'pause'|'resume'|'cancel'|'absent'|'correct'|'new';
+export function validDemoRequest(value:unknown):value is {scenario:'A'|'B'|'C',action:DemoAction} {
   if(!value || typeof value!=='object' || Array.isArray(value)) return false;
   const object=value as Record<string,unknown>;
-  return Object.keys(object).length===2 && ['A','B'].includes(String(object.scenario)) && ['next','reschedule','pause','resume','cancel'].includes(String(object.action));
+  return Object.keys(object).length===2 && ['A','B','C'].includes(String(object.scenario)) && ['next','reschedule','pause','resume','cancel','absent','correct','new'].includes(String(object.action));
 }
-export async function runDemo(service:SurveyService,scenario:'A'|'B',action:DemoAction,now:Date) {
+export async function runDemo(service:SurveyService,scenario:'A'|'B'|'C',action:DemoAction,now:Date) {
   const participantId=`demo:${scenario}`;
   const row=await service.store.getCurrent(participantId);
   if(row && !row.demo) throw new Error('not a demonstration record');
   let event:SurveyEvent={kind:'text',value:'/start'};
   let effectiveNow=now;
-  if(action!=='next') event={kind:'text',value:({reschedule:'/data',pause:'/pausar',resume:'/retomar',cancel:'/cancelar'} as const)[action]};
+  if(action==='new') event={kind:'text',value:'/nova'};
+  else if(action==='absent') event={kind:'choice',value:'no'};
+  else if(action==='correct') event=row?.state.step==='result'?{kind:'choice',value:'approved'}:{kind:'text',value:'/resultado'};
+  else if(action!=='next') event={kind:'text',value:({reschedule:'/data',pause:'/pausar',resume:'/retomar',cancel:'/cancelar'} as const)[action]};
   else if(row) {
     const state=row.state;
     switch(state.step) {
@@ -97,7 +102,7 @@ export async function runDemo(service:SurveyService,scenario:'A'|'B',action:Demo
         if(state.dueAt) {effectiveNow=new Date(state.dueAt);event={kind:'followup'};}
         else event={kind:'text',value:'/data'};
         break;
-      case 'attendance':event={kind:'choice',value:'yes'};break;
+      case 'attendance':event={kind:'choice',value:scenario==='C'?'no':'yes'};break;
       case 'result':event={kind:'choice',value:scenario==='A'?'approved':'pending'};break;
       case 'course_use':event={kind:'choice',value:'yes'};break;
       case 'course_alignment':event={kind:'choice',value:scenario==='A'?'much':'partly'};break;
@@ -114,5 +119,5 @@ export async function runDemo(service:SurveyService,scenario:'A'|'B',action:Demo
 
 export function publicRecord(state:SurveyState,demo:boolean) {
   const {participantId,attemptId,revision,scheduleRevision,...fields}=state;
-  return {...fields,id:attemptId,alias:participantId==='demo:A'?'Estudante A':participantId==='demo:B'?'Estudante B':'Participante de demonstração',fictitious:true,deliveryMode:demo?'simulated':'telegram',product:'Curso Alfa',certification:'Certificação Alfa',source:'declarado pelo participante'};
+  return {...fields,id:attemptId,alias:participantId==='demo:A'?'Estudante A':participantId==='demo:B'?'Estudante B':participantId==='demo:C'?'Estudante C':'Participante de demonstração',fictitious:true,deliveryMode:demo?'simulated':'telegram',product:'Curso Alfa',certification:'Certificação Alfa',source:'declarado pelo participante'};
 }

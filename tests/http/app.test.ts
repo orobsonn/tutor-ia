@@ -111,3 +111,32 @@ test('the delivered operator script parses before browser execution',async()=>{
   assert.ok(script);
   assert.doesNotThrow(()=>new Script(script[1]));
 });
+
+ test('equal operator secrets fail closed for mutation before storage',async()=>{
+ const response=await worker.fetch(request('/api/demo',{method:'POST',headers:{authorization:'Bearer test-read-only-token'},body:JSON.stringify({scenario:'A',action:'next'})}),{...env,OPERATOR_DEMO_TOKEN:env.OPERATOR_READ_TOKEN});
+ assert.equal(response.status,401);
+ });
+
+test('demo C proves pause, absence and cancellation while B allows result correction',async(t)=>{
+ const db=createTestDatabase();t.after(()=>db.close());
+ const localEnv={...env,DB:db,TELEGRAM_BOT_TOKEN:undefined};
+ const action=async(scenario:string,action:string)=>{
+  const response=await worker.fetch(request('/api/demo',{method:'POST',headers:{authorization:'Bearer test-demo-only-token','content-type':'application/json'},body:JSON.stringify({scenario,action})}),localEnv);
+  assert.equal(response.status,200);return await response.json() as {state:{step:string;paused:boolean;attendance:string|null;result:string|null;courseAlignment:string|null;simulationUsed:boolean|null}};
+ };
+ for(let i=0;i<3;i++)await action('C','next');
+ await action('C','pause');
+ const paused=await action('C','next');assert.equal(paused.state.step,'scheduled');assert.equal(paused.state.paused,true);
+ await action('C','resume');await action('C','next');
+ const absent=await action('C','next');assert.equal(absent.state.attendance,'absent');assert.equal(absent.state.courseAlignment,null);
+ const preserved=await action('C','cancel');assert.equal(preserved.state.attendance,'absent');
+ await action('C','new');
+ const canceled=await action('C','cancel');assert.equal(canceled.state.attendance,'cancelled');assert.equal(canceled.state.step,'done');
+ for(let i=0;i<13;i++)await action('B','next');
+ await action('B','correct');const corrected=await action('B','correct');
+ assert.equal(corrected.state.result,'approved');assert.equal(corrected.state.simulationUsed,false);assert.equal(corrected.state.courseAlignment,'partly');
+ const response=await worker.fetch(request('/api/records',{headers:{authorization:'Bearer test-read-only-token'}}),localEnv);
+ const data=await response.json() as {records:Array<{alias:string;result:string}>,metrics:Array<{label:string;value:number;total:number}>};
+ assert.equal(data.records.length,3);assert.equal(data.records.find(row=>row.alias==='Estudante B')?.result,'approved');
+ const nonUse=data.metrics.find(row=>row.label==='Simulados: não usaram / provas realizadas');assert.deepEqual(nonUse,{label:'Simulados: não usaram / provas realizadas',value:1,total:1});
+});

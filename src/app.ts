@@ -5,6 +5,7 @@ import { SurveyStore } from './storage.ts';
 import type { D1Like } from './storage.ts';
 import { publicRecord, runDemo, SurveyService, telegramSender, validDemoRequest } from './service.ts';
 import type { Sender } from './service.ts';
+import { surveyMetrics } from './metrics.ts';
 import { operatorPage } from './operator.ts';
 
 export interface POCEnv {
@@ -15,7 +16,7 @@ export interface POCEnv {
   TELEGRAM_WEBHOOK_SECRET_TOKEN?: string;
   TELEGRAM_ALLOWED_USER_IDS?: string;
 }
-export function createApp(env:POCEnv,sender:Sender=telegramSender(env.TELEGRAM_BOT_TOKEN,env.TELEGRAM_WEBHOOK_SECRET_TOKEN)) {
+export function createApp(env:POCEnv,sender:Sender=telegramSender(env.TELEGRAM_BOT_TOKEN,env.TELEGRAM_WEBHOOK_SECRET_TOKEN,env.TELEGRAM_ALLOWED_USER_IDS)) {
   const app=new Hono();
   const service=new SurveyService(new SurveyStore(env.DB),sender);
   app.use('*',async(c,next)=>{
@@ -30,10 +31,10 @@ export function createApp(env:POCEnv,sender:Sender=telegramSender(env.TELEGRAM_B
     if(!authorized(c.req.raw,env.OPERATOR_READ_TOKEN)) return c.json({error:'unauthorized'},401);
     const rows=await service.store.list();
     const deliveries=await service.store.recentDeliveries();
-    return c.json({records:rows.map(row=>publicRecord(row.state,row.demo)),deliveries:deliveries.map(({status,kind,demo,updatedAt})=>({status,kind,demo,updatedAt})),disclaimer:'Dados fictícios; percepções declaradas, não equivalência objetiva.'});
+    return c.json({metrics:surveyMetrics(rows.map(row=>row.state)),records:rows.map(row=>publicRecord(row.state,row.demo)),deliveries:deliveries.map(({status,kind,demo,updatedAt})=>({status,kind,demo,updatedAt})),disclaimer:'Dados fictícios; percepções declaradas, não equivalência objetiva.'});
   });
   app.post('/api/demo',async(c)=>{
-    if(!authorized(c.req.raw,env.OPERATOR_DEMO_TOKEN)) return c.json({error:'unauthorized'},401);
+    if(env.OPERATOR_READ_TOKEN===env.OPERATOR_DEMO_TOKEN || !authorized(c.req.raw,env.OPERATOR_DEMO_TOKEN)) return c.json({error:'unauthorized'},401);
     if(Number(c.req.header('content-length')??0)>2048) return c.json({error:'body_too_large'},413);
     const text=await c.req.text();
     if(text.length>2048) return c.json({error:'body_too_large'},413);

@@ -27,3 +27,9 @@ O teste real de evento scheduled no runtime local retornou outcome=exception: o 
 ## Limites
 
 Não é E2E do Telegram: token/bot inexistentes. Não há efeito externo de envio na simulação, não há dados acadêmicos reais e não foi verificada eficácia pedagógica. Deploy remoto, revisão final e execução da CI serão registrados quando ocorrerem, sem retroagir alegações.
+
+## Revisão independente e correções
+
+A revisão final inicial pediu alterações: revogação da allowlist no envio, distinção de data pretendida, cenário C/correção, limite total do cron, rejeição de segredos iguais, confirmação tardia e denominadores dos indicadores. Foram adicionadas correções e testes direcionados; nova revisão independente está em andamento.
+
+O cron nativo foi reexecutado no workerd local e retornou outcome=ok. CI do PR passou na revisão anterior; deverá rodar novamente para as correções. Nenhuma alegação de Telegram real decorre desses testes.

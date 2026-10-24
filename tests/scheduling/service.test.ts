@@ -56,3 +56,22 @@ test('Flue native Cloudflare entry exports and executes the cron handler',async(
   assert.equal(typeof cloudflareEntry.scheduled,'function');
   await cloudflareEntry.scheduled({cron:'*/5 * * * *'},{DB:db});
 });
+
+import { telegramSender } from '../../src/service.ts';
+test('revoked Telegram recipient is canceled at dispatch without a provider call',async()=>{
+ const sender=telegramSender('invalid-token','test-secret','1002');
+ const receipt=await sender.send({demo:false,participantId:'tg:1001',buttons:[]} as unknown as Outbox);
+ assert.equal(receipt.status,'canceled');
+});
+test('one cron passage dispatches no more than twenty messages with due backlog',async(t)=>{
+ const {db,service,sent}=setup();t.after(()=>db.close());
+ for(let index=0;index<25;index++){
+ const participantId=`tg:${2000+index}`;
+ for(const [seq,value,kind] of [[0,'/start','text'],[1,'2026-11-02','text'],[2,'confirm','choice']] as const){
+ await service.handleAuthorizedInput({participantId,eventId:`${participantId}:${seq}`,event:{kind,value},demo:false,now});
+ }
+ }
+ sent.length=0;
+ await service.tick(new Date('2026-11-03T13:00:00Z'));
+ assert.equal(sent.length,20);
+});

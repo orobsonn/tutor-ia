@@ -31,6 +31,7 @@ export interface SurveyState {
   scheduleRevision: number;
   step: SurveyStep;
   examDate: string | null;
+  examDateStatus: 'scheduled' | 'intended' | 'undated';
   candidateDate: string | null;
   dueAt: string | null;
   attendance: Attendance | null;
@@ -60,7 +61,8 @@ const DATE_BUTTONS: SurveyButton[] = [
   { text: 'Cancelar esta prova', value: 'no' },
 ];
 const CONFIRM_DATE_BUTTONS: SurveyButton[] = [
-  { text: 'Confirmar data', value: 'confirm' },
+  { text: 'Já está marcada: confirmar', value: 'confirm' },
+  { text: 'É apenas uma data pretendida', value: 'intended' },
   { text: 'Corrigir data', value: 'no' },
 ];
 const SCHEDULED_BUTTONS: SurveyButton[] = [
@@ -107,6 +109,7 @@ export function createSurvey(participantId: string, attemptId: string): SurveySt
     scheduleRevision: 0,
     step: 'date',
     examDate: null,
+    examDateStatus: 'undated',
     candidateDate: null,
     dueAt: null,
     attendance: null,
@@ -140,7 +143,7 @@ export function transition(
     case 'date':
       return handleDate(state, event.kind, value, now);
     case 'confirm_date':
-      return handleDateConfirmation(state, event.kind, value);
+      return handleDateConfirmation(state, event.kind, value, now);
     case 'scheduled':
       return invalid(state, 'A prova está aguardando a data combinada. Use /data para alterar.');
     case 'attendance':
@@ -203,10 +206,10 @@ function handleCommand(state: SurveyState, command: string): SurveyResponse {
 }
 
 function reopenDate(state: SurveyState): SurveyResponse {
-  if (state.attendance === 'performed') {
+  if (state.attendance === 'performed' || state.attendance === 'absent') {
     return invalid(
       state,
-      'Esta prova já foi realizada. Para outra prova, crie uma nova tentativa com /nova.',
+      'Esta tentativa já foi encerrada por realização ou ausência. Para outra prova, crie uma nova tentativa com /nova.',
     );
   }
 
@@ -217,6 +220,7 @@ function reopenDate(state: SurveyState): SurveyResponse {
   const reopened = update(state, {
     step: 'date',
     examDate: null,
+    examDateStatus: 'undated',
     candidateDate: null,
     dueAt: null,
     attendance: null,
@@ -227,16 +231,17 @@ function reopenDate(state: SurveyState): SurveyResponse {
 }
 
 function cancelExam(state: SurveyState): SurveyResponse {
-  if (state.attendance === 'performed') {
+  if (state.attendance === 'performed' || state.attendance === 'absent') {
     return invalid(
       state,
-      'Esta prova já foi realizada. Para outra prova, crie uma nova tentativa com /nova.',
+      'Esta tentativa já foi encerrada por realização ou ausência. Para outra prova, crie uma nova tentativa com /nova.',
     );
   }
 
   const cancelled = update(state, {
     step: 'done',
     examDate: null,
+    examDateStatus: 'undated',
     candidateDate: null,
     dueAt: null,
     attendance: 'cancelled',
@@ -275,6 +280,7 @@ function handleDate(
       const undated = update(state, {
         step: 'scheduled',
         examDate: null,
+        examDateStatus: 'undated',
         candidateDate: null,
         dueAt: null,
         attendance: null,
@@ -305,28 +311,33 @@ function handleDateConfirmation(
   state: SurveyState,
   kind: 'text' | 'choice',
   value: string,
+  now: Date,
 ): SurveyResponse {
   if (kind !== 'choice') return invalidChoice(state, CONFIRM_DATE_BUTTONS);
   if (value === 'no') {
     const correcting = update(state, { step: 'date', candidateDate: null });
     return response(correcting, 'Informe a data correta no formato AAAA-MM-DD.', DATE_BUTTONS);
   }
-  if (value !== 'confirm' || state.candidateDate === null) {
+  if (!['confirm','intended'].includes(value) || state.candidateDate === null) {
     return invalidChoice(state, CONFIRM_DATE_BUTTONS);
   }
 
+  if (!isAllowedExamDate(state.candidateDate, now)) {
+    return response(update(state, {step:'date',candidateDate:null}), 'Essa data já passou. Informe uma nova data no formato AAAA-MM-DD.', DATE_BUTTONS);
+  }
   const examDate = state.candidateDate;
   const scheduled = update(state, {
     step: 'scheduled',
     examDate,
     candidateDate: null,
-    dueAt: dueAtForExamDate(examDate),
+    examDateStatus: value === 'intended' ? 'intended' : 'scheduled',
+    dueAt: value === 'intended' ? null : dueAtForExamDate(examDate),
     attendance: null,
     scheduleRevision: state.scheduleRevision + 1,
   });
   return response(
     scheduled,
-    `Data confirmada. O contato está previsto para ${scheduled.dueAt}.`,
+    value === 'intended' ? `Data pretendida registrada: ${examDate}. Sem contato pós-prova programado; use /data quando estiver marcada.` : `Data confirmada. O contato está previsto para ${scheduled.dueAt}.`,
     SCHEDULED_BUTTONS,
   );
 }
@@ -541,7 +552,7 @@ function renderStep(state: SurveyState): SurveyResponse {
       return state.dueAt === null
         ? response(
             state,
-            'Tentativa sem data e sem contato programado. Use /data quando souber.',
+            state.examDateStatus === 'intended' ? `Data pretendida: ${state.examDate}. Sem contato programado. Use /data quando estiver marcada.` : 'Tentativa sem data e sem contato programado. Use /data quando souber.',
             SCHEDULED_BUTTONS,
           )
         : response(state, `Prova agendada para ${state.examDate}.`, SCHEDULED_BUTTONS);
@@ -593,7 +604,7 @@ function summary(state: SurveyState): string {
         ? 'cancelada'
         : 'não informada';
   return [
-    `Data: ${state.examDate ?? 'sem data'}`,
+    `Data: ${state.examDate ?? 'sem data'} (${state.examDateStatus})`,
     `Situação: ${attendance}`,
     `Resultado: ${state.result ?? 'não informado'}`,
     `Curso: ${state.courseUsed === null ? 'não informado' : state.courseUsed ? 'usou' : 'não usou'}`,

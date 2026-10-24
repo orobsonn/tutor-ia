@@ -5,6 +5,6 @@ import type { POCEnv } from './app.ts';
 
 export default {
   async scheduled(_event:unknown,env:POCEnv) {
-    await new SurveyService(new SurveyStore(env.DB),telegramSender(env.TELEGRAM_BOT_TOKEN,env.TELEGRAM_WEBHOOK_SECRET_TOKEN)).tick(new Date());
+    await new SurveyService(new SurveyStore(env.DB),telegramSender(env.TELEGRAM_BOT_TOKEN,env.TELEGRAM_WEBHOOK_SECRET_TOKEN,env.TELEGRAM_ALLOWED_USER_IDS)).tick(new Date());
   },
 };
