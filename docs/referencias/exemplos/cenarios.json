@@ -1,0 +1,39 @@
+{
+  "tipo": "exemplos fictícios próprios para demonstração; não é schema definitivo",
+  "cenarios": [
+    {
+      "aluno_id": "demo-001",
+      "apelido": "Estudante A",
+      "produto": "Curso Alfa",
+      "certificacao": "Certificação Alfa",
+      "data_prova": "2026-11-05",
+      "realizou": true,
+      "resultado": "aprovado",
+      "origem": "declarado pelo participante fictício",
+      "usou_curso": true,
+      "aderencia_curso": "muito",
+      "usou_simulados": true,
+      "conteudo_simulados": "em parte",
+      "formato_simulados": "pouco",
+      "dificuldade_prova_vs_simulados": "mais difícil",
+      "comentario": "O curso ajudou; senti falta de formatos de exercício parecidos nos simulados."
+    },
+    {
+      "aluno_id": "demo-002",
+      "apelido": "Estudante B",
+      "produto": "Curso Alfa",
+      "certificacao": "Certificação Alfa",
+      "data_prova": "2026-11-05",
+      "realizou": true,
+      "resultado": "pendente",
+      "origem": "declarado pelo participante fictício",
+      "usou_curso": true,
+      "aderencia_curso": "em parte",
+      "usou_simulados": false,
+      "conteudo_simulados": null,
+      "formato_simulados": null,
+      "dificuldade_prova_vs_simulados": null,
+      "comentario": "Ainda aguardo resultado; consigo avaliar o curso, mas não usei simulados."
+    }
+  ]
+}

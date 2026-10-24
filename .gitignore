@@ -1,0 +1,20 @@
+# Dados locais e credenciais
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+.DS_Store
+node_modules/
+dist/
+.wrangler/
+coverage/
+# Acervo privado não pertence ao repositório
+privado/
+private/
+docs/privado/
+originais/
+*.zip
+*.mp3
+*.ogg
+*.wav
