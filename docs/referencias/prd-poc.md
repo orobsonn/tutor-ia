@@ -17,7 +17,7 @@ Sucesso da POC: um participante autorizado, representando aluno fictício, compl
 - Não depender de API de aulas, progresso ou banco de questões.
 - Repositório e documentação públicos e genéricos; credenciais, identidades de chats/contas e registros coletados ficam fora do Git.
 
-O bot de Telegram ainda não foi criado. Sua ausência não bloqueia construção, simulação e testes locais; bloqueia somente conexão e aceite ponta a ponta no Telegram real.
+Atualização de 24/10/2026: bot exclusivo criado e conectado; /start e callback assinado verificados com persistência. O ciclo pós-prova completo pelo Telegram real ainda precisa ser executado. A implementação/simulação foi construída antes da disponibilização do bot.
 
 ## 3. Usuários e entrada
 
@@ -76,6 +76,6 @@ Planos/rotina, consumo de aulas, recuperação de inatividade, revisão por ques
 
 ## 10. Pendências e escolhas de implementação
 
-Responsável providenciará bot exclusivo e credencial por canal/configuração privada; nenhum token será solicitado em issue ou commit. Identificação/ativação de participantes e operador será definida sem publicar IDs pessoais. Não redirecionar bot ou webhook de outro projeto.
+Bot exclusivo e credenciais foram configurados de forma privada; nenhum token será solicitado em issue ou commit. Identificação/ativação de participantes e operador será definida sem publicar IDs pessoais. Não redirecionar bot ou webhook de outro projeto.
 
 Conta Cloudflare, runtime Flue, armazenamento, agenda e proteção do operador devem ser verificados antes do deploy. Arquitetura não trivial passa por revisão adversarial. Não contratar capacidade adicional nem mudar outros projetos por inferência. A ausência do bot não bloqueia o trabalho independente.

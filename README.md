@@ -2,7 +2,7 @@
 
 Acompanhamento de provas e coleta de feedback sobre a preparação oferecida por cursos e simulados.
 
-**Estado em 24/10/2026:** POC implementada e publicada em ambiente exclusivo de demonstração na Cloudflare; cenários fictícios validados por HTTP com persistência. Telegram real e homologação humana ainda pendentes. Este repositório é público e contém documentação genérica, sem registros de alunos, conversas ou documentos de organizações.
+**Estado em 24/10/2026:** POC implementada e publicada em ambiente exclusivo de demonstração na Cloudflare; cenários fictícios validados por HTTP com persistência. Bot Telegram conectado com início de conversa e botão verificados; ciclo pós-prova completo e homologação humana ainda pendentes. Este repositório é público e contém documentação genérica, sem registros de alunos, conversas ou documentos de organizações.
 
 ## Comece pela pergunta
 
@@ -34,4 +34,4 @@ Acompanhamento de provas e coleta de feedback sobre a preparação oferecida por
 
 A POC pergunta a data da prova, faz contato depois, registra realização/resultado e coleta a percepção do aluno sobre a aderência do curso e dos simulados. Ela não compara objetivamente questões de provas e não promete aprovação.
 
-Há implementação e simulador local/remoto com persistência; o Telegram real ainda não foi conectado. [Como executar e configurar](docs/solucoes/poc.md). A construção usa Telegram, Flue e Cloudflare; o bot exclusivo ainda não foi criado. Regras de manutenção: [AGENTS.md](AGENTS.md). Mudanças: [CHANGELOG.md](CHANGELOG.md).
+Há implementação e simulador local/remoto com persistência; o Telegram já foi conectado e respondeu ao teste inicial. [Como executar e configurar](docs/solucoes/poc.md). A construção usa Telegram, Flue e Cloudflare; o bot exclusivo foi criado e configurado com acesso restrito. Regras de manutenção: [AGENTS.md](AGENTS.md). Mudanças: [CHANGELOG.md](CHANGELOG.md).

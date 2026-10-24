@@ -64,3 +64,11 @@ Homologação no Telegram continua condicionada ao bot exclusivo: getMe, configu
 | RF10 — demo | A/B/C executados por HTTP com relógio individual e sender simulado | Bot exclusivo ainda inexistente |
 
 Entregáveis de código, PRD, configuração, harness, revisão, testes/build, documentação e publicação da demonstração foram verificados. O aceite de canal real previsto no item 6 da definição de pronto permanece explicitamente condicionado à disponibilidade do bot.
+
+## Conexão inicial do Telegram — atualização de 24/10/2026
+
+Com autorização do responsável, o bot exclusivo foi criado no BotFather pelo Chrome conectado. Identidade validada por getMe; getWebhookInfo confirmou ausência de webhook anterior antes de configurar o endpoint exclusivo. Token, segredo do webhook e único ID de participante autorizado ficaram em configuração privada.
+
+O participante iniciou /start no Telegram real. O Worker respondeu identificando Curso Alfa/Certificação Alfa e os dados fictícios. O botão assinado “Ainda não tenho data” foi acionado pelo chat; a consulta autenticada confirmou uma tentativa em transporte Telegram, estado sem data e sem contato agendado. Entregas reais desse teste têm status sent; webhook sem pendências ou erro. Isso comprova ingresso, resposta, callback e persistência iniciais — não o ciclo pós-prova completo.
+
+A tela da equipe passou a chamar o bloco de demonstração “Simular conversa com aluno”, explicando o efeito dos cliques e distinguindo esses controles da rotina operacional.
