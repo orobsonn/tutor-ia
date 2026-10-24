@@ -13,6 +13,9 @@ As mudanças relevantes seguem o formato Keep a Changelog. A implementação da 
 
 ### Changed
 
+- Mensagens do Telegram em blocos legíveis, datas brasileiras e resumo das respostas em português.
+- Entrada DD/MM/AAAA aceita com validação e normalização para a data canônica.
+
 - Consulta da equipe em fichas responsivas, com feedbacks e comentários sem rolagem horizontal.
 - Controles de simulação retirados da interface de consulta.
 

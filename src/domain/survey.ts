@@ -185,14 +185,14 @@ function handleCommand(state: SurveyState, command: string): SurveyResponse {
       if (state.paused) return response(state, 'Os contatos programados já estão pausados.');
       return response(
         update(state, { paused: true }),
-        'Contatos programados pausados. Você ainda pode corrigir /data ou /resultado.',
+        "⏸ Contatos programados pausados\n\nVocê ainda pode corrigir a data com /data e o resultado com /resultado.\n\nPara retomar os contatos, envie /retomar.",
       );
     }
     case '/retomar': {
       if (!state.paused) return response(state, 'Os contatos programados já estão ativos.');
       const resumed = update(state, { paused: false });
       const current = renderStep(resumed);
-      return response(resumed, `Contatos retomados. ${current.message}`, current.buttons);
+      return response(resumed, `▶ Contatos retomados.\n\n${current.message}`, current.buttons);
     }
     case '/data':
       return reopenDate(state);
@@ -227,7 +227,7 @@ function reopenDate(state: SurveyState): SurveyResponse {
     scheduleRevision: state.scheduleRevision + 1,
     returnStep: undefined,
   });
-  return response(reopened, 'Informe a nova data da prova no formato AAAA-MM-DD.', DATE_BUTTONS);
+  return response(reopened, "📅 Vamos atualizar a data da prova.\n\nEnvie a nova data no formato DD/MM/AAAA.", DATE_BUTTONS);
 }
 
 function cancelExam(state: SurveyState): SurveyResponse {
@@ -256,7 +256,7 @@ function cancelExam(state: SurveyState): SurveyResponse {
     scheduleRevision: state.scheduleRevision + 1,
     returnStep: undefined,
   });
-  return response(cancelled, 'Prova cancelada. Nenhuma avaliação será solicitada.');
+  return response(cancelled, "📅 Prova cancelada\n\nO contato pós-prova foi cancelado e nenhuma avaliação será solicitada.\n\nPara registrar outra prova, envie /nova.");
 }
 
 function reopenResult(state: SurveyState): SurveyResponse {
@@ -266,7 +266,7 @@ function reopenResult(state: SurveyState): SurveyResponse {
   if (state.step === 'result') return renderStep(state);
 
   const reopened = update(state, { step: 'result', returnStep: state.step });
-  return response(reopened, 'Qual é o resultado correto?', RESULT_BUTTONS);
+  return response(reopened, "🎯 Vamos corrigir o resultado.\n\nEscolha abaixo a informação atual. As avaliações que você já enviou serão preservadas.", RESULT_BUTTONS);
 }
 
 function handleDate(
@@ -287,7 +287,7 @@ function handleDate(
       });
       return response(
         undated,
-        'Tentativa registrada sem data. Nenhum contato foi programado; use /data quando souber.',
+        "📅 Prova registrada sem data\n\nTudo bem! Nenhum contato pós-prova foi agendado.\n\nQuando souber a data, use o botão abaixo ou envie /data.",
         SCHEDULED_BUTTONS,
       );
     }
@@ -295,16 +295,17 @@ function handleDate(
     return invalidChoice(state);
   }
 
-  if (!isAllowedExamDate(value, now)) {
+  const normalized = normalizeInputDate(value);
+  if (!isAllowedExamDate(normalized, now)) {
     return invalid(
       state,
-      'Informe uma data válida no formato AAAA-MM-DD, de hoje até 730 dias no futuro.',
+      "Não consegui validar essa data.\n\nEnvie no formato DD/MM/AAAA, entre hoje e os próximos 730 dias.",
       DATE_BUTTONS,
     );
   }
 
-  const proposed = update(state, { step: 'confirm_date', candidateDate: value });
-  return response(proposed, `Confirma a prova em ${value}?`, CONFIRM_DATE_BUTTONS);
+  const proposed = update(state, { step: 'confirm_date', candidateDate: normalized });
+  return response(proposed, `📅 Confira a data da prova\n\n${formatDate(normalized)}\n\nEla já está marcada ou é apenas uma data pretendida?`, CONFIRM_DATE_BUTTONS);
 }
 
 function handleDateConfirmation(
@@ -316,14 +317,14 @@ function handleDateConfirmation(
   if (kind !== 'choice') return invalidChoice(state, CONFIRM_DATE_BUTTONS);
   if (value === 'no') {
     const correcting = update(state, { step: 'date', candidateDate: null });
-    return response(correcting, 'Informe a data correta no formato AAAA-MM-DD.', DATE_BUTTONS);
+    return response(correcting, "📅 Qual é a data correta?\n\nEnvie no formato DD/MM/AAAA.", DATE_BUTTONS);
   }
   if (!['confirm','intended'].includes(value) || state.candidateDate === null) {
     return invalidChoice(state, CONFIRM_DATE_BUTTONS);
   }
 
   if (!isAllowedExamDate(state.candidateDate, now)) {
-    return response(update(state, {step:'date',candidateDate:null}), 'Essa data já passou. Informe uma nova data no formato AAAA-MM-DD.', DATE_BUTTONS);
+    return response(update(state, {step:'date',candidateDate:null}), "Essa data já passou.\n\n📅 Envie uma nova data no formato DD/MM/AAAA.", DATE_BUTTONS);
   }
   const examDate = state.candidateDate;
   const scheduled = update(state, {
@@ -337,29 +338,29 @@ function handleDateConfirmation(
   });
   return response(
     scheduled,
-    value === 'intended' ? `Data pretendida registrada: ${examDate}. Sem contato pós-prova programado; use /data quando estiver marcada.` : `Data confirmada. O contato está previsto para ${scheduled.dueAt}.`,
+    value === 'intended' ? `📅 Data pretendida registrada\n\n${formatDate(examDate)}\n\nNenhum contato pós-prova foi agendado. Quando a prova estiver marcada, envie /data.` : `✅ Prova registrada\n\n📅 Data da prova: ${formatDate(examDate)}\n💬 Contato pós-prova: ${formatContact(scheduled.dueAt)} (horário de Fortaleza).\n\nSe a data mudar, use o botão abaixo ou envie /data.`,
     SCHEDULED_BUTTONS,
   );
 }
 
 function handleFollowup(state: SurveyState, now: Date): SurveyResponse {
   if (state.paused) {
-    return response(state, 'Os contatos programados estão pausados. Use /retomar para continuar.');
+    return response(state, "⏸ Os contatos programados estão pausados.\n\nPara retomar, envie /retomar.");
   }
   if (state.step !== 'scheduled') return renderStep(state);
   if (state.dueAt === null) {
     return response(
       state,
-      'A tentativa continua sem data e sem contato programado. Use /data quando souber.',
+      "📅 Ainda não temos uma data confirmada.\n\nNenhum contato pós-prova está agendado. Use /data quando souber.",
       SCHEDULED_BUTTONS,
     );
   }
   if (now.getTime() < Date.parse(state.dueAt)) {
-    return response(state, `O contato ainda não venceu. Está previsto para ${state.dueAt}.`);
+    return response(state, `💬 Nosso contato pós-prova está previsto para ${formatContact(state.dueAt)}, no horário de Fortaleza.`);
   }
 
   const asking = update(state, { step: 'attendance' });
-  return response(asking, 'Você realizou a prova prevista?', ATTENDANCE_BUTTONS);
+  return response(asking, "📝 Como foi sua prova?\n\nVocê conseguiu realizá-la?\nEscolha uma opção abaixo.", ATTENDANCE_BUTTONS);
 }
 
 function handleAttendance(
@@ -370,7 +371,7 @@ function handleAttendance(
   if (kind !== 'choice') return invalidChoice(state, ATTENDANCE_BUTTONS);
   if (value === 'yes') {
     const performed = update(state, { step: 'result', attendance: 'performed' });
-    return response(performed, 'Qual foi o resultado?', RESULT_BUTTONS);
+    return response(performed, "🎯 Qual foi o resultado da prova?\n\nSe ainda não saiu, escolha “Aguardando resultado”. Você pode avaliar a preparação agora e atualizar o resultado depois.", RESULT_BUTTONS);
   }
   if (value === 'no') {
     const absent = update(state, {
@@ -385,7 +386,7 @@ function handleAttendance(
       simulationDifficulty: null,
       comment: null,
     });
-    return response(absent, 'Ausência registrada. Nenhuma avaliação será solicitada.');
+    return response(absent, "📅 Ausência registrada\n\nNão vou pedir avaliações do curso ou dos simulados para esta tentativa.\n\nPara registrar outra prova, envie /nova.");
   }
   return invalidChoice(state, ATTENDANCE_BUTTONS);
 }
@@ -405,16 +406,16 @@ function handleResult(
     const returnStep = state.returnStep;
     const corrected = update(state, { result, step: returnStep, returnStep: undefined });
     const current = renderStep(corrected);
-    return response(corrected, `Resultado corrigido. ${current.message}`, current.buttons);
+    return response(corrected, `✅ Resultado atualizado.\n\n${current.message}`, current.buttons);
   }
 
   const answered = update(state, { result, step: 'course_use' });
   const prefix = result === 'approved'
-    ? 'Parabéns pela aprovação. '
+    ? '🎉 Parabéns pela aprovação!\n\n'
     : result === 'failed'
-      ? 'Obrigado por compartilhar. '
-      : '';
-  return response(answered, `${prefix}Você utilizou o curso para se preparar?`, USE_BUTTONS);
+      ? 'Obrigado por compartilhar o resultado.\n\n'
+      : 'Você pode atualizar o resultado depois usando /resultado.\n\n';
+  return response(answered, `${prefix}📚 Você utilizou o curso para se preparar?`, USE_BUTTONS);
 }
 
 function handleCourseUse(
@@ -429,7 +430,7 @@ function handleCourseUse(
     const used = update(state, { step: 'course_alignment', courseUsed: true });
     return response(
       used,
-      'Quanto o conteúdo do curso correspondeu ao cobrado?',
+      "📚 Curso · conteúdo\n\nQuanto o conteúdo do curso correspondeu ao que caiu na prova?",
       ALIGNMENT_BUTTONS,
     );
   }
@@ -439,7 +440,7 @@ function handleCourseUse(
     courseUsed: false,
     courseAlignment: null,
   });
-  return response(unused, 'Você utilizou os simulados?', USE_BUTTONS);
+  return response(unused, "📝 Você utilizou os simulados na preparação?\n\nSe não utilizou, escolha “Não usei”.", USE_BUTTONS);
 }
 
 function handleAlignment(
@@ -456,18 +457,18 @@ function handleAlignment(
 
   const answered = update(state, { [field]: value as Alignment, step: nextStep });
   if (nextStep === 'simulation_use') {
-    return response(answered, 'Você utilizou os simulados?', USE_BUTTONS);
+    return response(answered, "📝 Você utilizou os simulados na preparação?\n\nSe não utilizou, escolha “Não usei”.", USE_BUTTONS);
   }
   if (nextStep === 'simulation_format') {
     return response(
       answered,
-      'Quanto o formato das questões dos simulados se pareceu com a prova?',
+      "📝 Simulados · formato\n\nQuanto o formato das questões dos simulados se pareceu com o da prova?",
       ALIGNMENT_BUTTONS,
     );
   }
   return response(
     answered,
-    'A prova foi mais fácil, semelhante ou mais difícil que os simulados?',
+    "📝 Simulados · dificuldade\n\nA prova foi mais fácil, semelhante ou mais difícil que os simulados?",
     DIFFICULTY_BUTTONS,
   );
 }
@@ -484,7 +485,7 @@ function handleSimulationUse(
     const used = update(state, { step: 'simulation_content', simulationUsed: true });
     return response(
       used,
-      'Quanto os assuntos dos simulados corresponderam ao cobrado?',
+      "📝 Simulados · conteúdo\n\nQuanto os assuntos dos simulados corresponderam ao que caiu na prova?",
       ALIGNMENT_BUTTONS,
     );
   }
@@ -496,7 +497,7 @@ function handleSimulationUse(
     simulationFormat: null,
     simulationDifficulty: null,
   });
-  return response(unused, 'Deseja deixar um comentário opcional?', COMMENT_BUTTONS);
+  return response(unused, "💬 Quer acrescentar algum comentário?\n\nPode contar o que ajudou ou o que sentiu falta na preparação, sem reproduzir questões da prova.\n\nSe preferir, escolha “Pular comentário”.", COMMENT_BUTTONS);
 }
 
 function handleSimulationDifficulty(
@@ -512,7 +513,7 @@ function handleSimulationDifficulty(
     step: 'comment',
     simulationDifficulty: value as SimulationDifficulty,
   });
-  return response(answered, 'Deseja deixar um comentário opcional?', COMMENT_BUTTONS);
+  return response(answered, "💬 Quer acrescentar algum comentário?\n\nPode contar o que ajudou ou o que sentiu falta na preparação, sem reproduzir questões da prova.\n\nSe preferir, escolha “Pular comentário”.", COMMENT_BUTTONS);
 }
 
 function handleComment(
@@ -522,16 +523,16 @@ function handleComment(
 ): SurveyResponse {
   if (kind === 'choice') {
     if (value !== 'skip') return invalidChoice(state, COMMENT_BUTTONS);
-    return response(update(state, { step: 'done', comment: null }), 'Respostas registradas. Obrigado!');
+    return response(update(state, { step: 'done', comment: null }), "✅ Respostas registradas!\n\nObrigado por compartilhar sua experiência.\n\nConsultar respostas: /resumo\nCorrigir resultado: /resultado\nRegistrar outra prova: /nova");
   }
 
   if (value.length === 0) {
-    return invalid(state, 'Escreva um comentário ou escolha pular.', COMMENT_BUTTONS);
+    return invalid(state, "Envie seu comentário em uma mensagem ou escolha “Pular comentário”.", COMMENT_BUTTONS);
   }
   if (value.length > 1000) {
-    return invalid(state, 'O comentário deve ter no máximo 1000 caracteres.', COMMENT_BUTTONS);
+    return invalid(state, "Seu comentário ficou muito longo.\n\nEnvie uma versão com até 1000 caracteres ou escolha “Pular comentário”.", COMMENT_BUTTONS);
   }
-  return response(update(state, { step: 'done', comment: value }), 'Respostas registradas. Obrigado!');
+  return response(update(state, { step: 'done', comment: value }), "✅ Respostas registradas!\n\nObrigado por compartilhar sua experiência.\n\nConsultar respostas: /resumo\nCorrigir resultado: /resultado\nRegistrar outra prova: /nova");
 }
 
 function renderStep(state: SurveyState): SurveyResponse {
@@ -539,77 +540,94 @@ function renderStep(state: SurveyState): SurveyResponse {
     case 'date':
       return response(
         state,
-        'Informe a data da prova no formato AAAA-MM-DD.',
+        "📅 Qual é a data da sua prova?\n\nEnvie no formato DD/MM/AAAA. Se ainda não tiver uma data, escolha uma opção abaixo.",
         DATE_BUTTONS,
       );
     case 'confirm_date':
       return response(
         state,
-        `Confirma a prova em ${state.candidateDate ?? 'data não informada'}?`,
+        `📅 Confira a data da prova\n\n${formatDate(state.candidateDate)}\n\nEla já está marcada ou é apenas uma data pretendida?`,
         CONFIRM_DATE_BUTTONS,
       );
     case 'scheduled':
       return state.dueAt === null
         ? response(
             state,
-            state.examDateStatus === 'intended' ? `Data pretendida: ${state.examDate}. Sem contato programado. Use /data quando estiver marcada.` : 'Tentativa sem data e sem contato programado. Use /data quando souber.',
+            state.examDateStatus === 'intended' ? `📅 Data pretendida: ${formatDate(state.examDate)}\n\nNenhum contato pós-prova está agendado. Use /data quando a prova estiver marcada.` : "📅 Sua prova ainda está sem data.\n\nQuando souber, use o botão abaixo ou envie /data. Nenhum contato pós-prova está agendado.",
             SCHEDULED_BUTTONS,
           )
-        : response(state, `Prova agendada para ${state.examDate}.`, SCHEDULED_BUTTONS);
+        : response(state, `📅 Sua prova está marcada para ${formatDate(state.examDate)}.\n\nContato pós-prova: ${formatContact(state.dueAt)} (horário de Fortaleza).\n\nPara alterar a data, envie /data.`, SCHEDULED_BUTTONS);
     case 'attendance':
-      return response(state, 'Você realizou a prova prevista?', ATTENDANCE_BUTTONS);
+      return response(state, "📝 Como foi sua prova?\n\nVocê conseguiu realizá-la?\nEscolha uma opção abaixo.", ATTENDANCE_BUTTONS);
     case 'result':
-      return response(state, 'Qual foi o resultado?', RESULT_BUTTONS);
+      return response(state, "🎯 Qual foi o resultado da prova?\n\nSe ainda não saiu, escolha “Aguardando resultado”. Você pode avaliar a preparação agora e atualizar o resultado depois.", RESULT_BUTTONS);
     case 'course_use':
-      return response(state, 'Você utilizou o curso para se preparar?', USE_BUTTONS);
+      return response(state, "📚 Você utilizou o curso para se preparar?\n\nEscolha uma opção abaixo.", USE_BUTTONS);
     case 'course_alignment':
       return response(
         state,
-        'Quanto o conteúdo do curso correspondeu ao cobrado?',
+        "📚 Curso · conteúdo\n\nQuanto o conteúdo do curso correspondeu ao que caiu na prova?",
         ALIGNMENT_BUTTONS,
       );
     case 'simulation_use':
-      return response(state, 'Você utilizou os simulados?', USE_BUTTONS);
+      return response(state, "📝 Você utilizou os simulados na preparação?\n\nSe não utilizou, escolha “Não usei”.", USE_BUTTONS);
     case 'simulation_content':
       return response(
         state,
-        'Quanto os assuntos dos simulados corresponderam ao cobrado?',
+        "📝 Simulados · conteúdo\n\nQuanto os assuntos dos simulados corresponderam ao que caiu na prova?",
         ALIGNMENT_BUTTONS,
       );
     case 'simulation_format':
       return response(
         state,
-        'Quanto o formato das questões dos simulados se pareceu com a prova?',
+        "📝 Simulados · formato\n\nQuanto o formato das questões dos simulados se pareceu com o da prova?",
         ALIGNMENT_BUTTONS,
       );
     case 'simulation_difficulty':
       return response(
         state,
-        'A prova foi mais fácil, semelhante ou mais difícil que os simulados?',
+        "📝 Simulados · dificuldade\n\nA prova foi mais fácil, semelhante ou mais difícil que os simulados?",
         DIFFICULTY_BUTTONS,
       );
     case 'comment':
-      return response(state, 'Deseja deixar um comentário opcional?', COMMENT_BUTTONS);
+      return response(state, "💬 Quer acrescentar algum comentário?\n\nPode contar o que ajudou ou o que sentiu falta na preparação, sem reproduzir questões da prova.\n\nSe preferir, escolha “Pular comentário”.", COMMENT_BUTTONS);
     case 'done':
-      return response(state, `Pesquisa encerrada. ${summary(state)}`);
+      return response(state, summary(state));
   }
 }
 
+function normalizeInputDate(value: string): string {
+  const match = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(value);
+  return match ? `${match[3]}-${match[2]}-${match[1]}` : value;
+}
+
+function formatDate(value: string | null): string {
+  if (!value) return 'Não informada';
+  const [year, month, day] = value.split('-');
+  return `${day}/${month}/${year}`;
+}
+
+function formatContact(value: string | null): string {
+  if (!value) return 'Não agendado';
+  const date = new Date(value);
+  const day = date.toLocaleDateString('pt-BR', {timeZone: TIME_ZONE});
+  const hour = date.toLocaleTimeString('pt-BR', {timeZone: TIME_ZONE, hour:'2-digit', minute:'2-digit'});
+  return `${day} às ${hour}`;
+}
+
 function summary(state: SurveyState): string {
-  const attendance = state.attendance === 'performed'
-    ? 'realizada'
-    : state.attendance === 'absent'
-      ? 'ausência'
-      : state.attendance === 'cancelled'
-        ? 'cancelada'
-        : 'não informada';
-  return [
-    `Data: ${state.examDate ?? 'sem data'} (${state.examDateStatus})`,
-    `Situação: ${attendance}`,
-    `Resultado: ${state.result ?? 'não informado'}`,
-    `Curso: ${state.courseUsed === null ? 'não informado' : state.courseUsed ? 'usou' : 'não usou'}`,
-    `Simulados: ${state.simulationUsed === null ? 'não informado' : state.simulationUsed ? 'usou' : 'não usou'}`,
-  ].join(' · ');
+  const label = (value: string | null, options: Record<string,string>) => value ? options[value] ?? 'Não informado' : 'Não informado';
+  const use = (value: boolean | null) => value === null ? 'Não informado' : value ? 'Utilizou' : 'Não utilizou';
+  const alignment = {much:'Muito',partly:'Em parte',little:'Pouco',unknown:'Não consegue avaliar'};
+  const blocks = [
+    '📋 Resumo da sua prova',
+    `📅 Data: ${formatDate(state.examDate)}\nSituação da data: ${label(state.examDateStatus,{scheduled:'Marcada',intended:'Pretendida',undated:'Sem data'})}\nRealização: ${label(state.attendance,{performed:'Realizou',absent:'Não compareceu',cancelled:'Cancelada'})}\nResultado: ${label(state.result,{approved:'Aprovado',failed:'Reprovado',pending:'Aguardando resultado',unknown:'Não informado'})}`,
+    `📚 Curso\nUso: ${use(state.courseUsed)}` + (state.courseUsed ? `\nAderência do conteúdo: ${label(state.courseAlignment,alignment)}` : ''),
+    `📝 Simulados\nUso: ${use(state.simulationUsed)}` + (state.simulationUsed ? `\nConteúdo: ${label(state.simulationContent,alignment)}\nFormato: ${label(state.simulationFormat,alignment)}\nDificuldade da prova: ${label(state.simulationDifficulty,{easier:'Mais fácil',same:'Semelhante',harder:'Mais difícil',unknown:'Não consegue comparar'})}` : ''),
+  ];
+  if (state.comment) blocks.push(`💬 Comentário\n${state.comment}`);
+  blocks.push((state.attendance === 'performed' ? 'Corrigir resultado: /resultado\n' : '') + 'Registrar outra prova: /nova');
+  return blocks.join('\n\n');
 }
 
 function response(
@@ -632,7 +650,7 @@ function invalidChoice(
   state: SurveyState,
   buttons: SurveyButton[] = [],
 ): SurveyResponse {
-  return invalid(state, 'Escolha uma opção disponível.', buttons);
+  return invalid(state, "Escolha uma opção nos botões desta pergunta.\n\nPara rever a etapa atual, envie /start.", buttons);
 }
 
 function update(state: SurveyState, patch: Partial<SurveyState>): SurveyState {

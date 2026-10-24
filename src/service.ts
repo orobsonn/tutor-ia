@@ -41,7 +41,7 @@ export class SurveyService {
       state=createSurvey(input.participantId,crypto.randomUUID());
       response=transition(state,{kind:'text',value:'/start'},input.now);
     } else response=transition(state,input.event,input.now);
-    if(!current || (input.event.kind==='text' && input.event.value==='/nova')) response={...response,message:'Demonstração com dados fictícios: Curso Alfa · Certificação Alfa.\n\n'+response.message};
+    if(!current || (input.event.kind==='text' && input.event.value==='/nova')) response={...response,message:'Olá! Vou acompanhar sua prova e ouvir como foi sua preparação.\n\n🧪 Demonstração com dados fictícios\nCurso: Curso Alfa\nProva: Certificação Alfa\n\n'+response.message};
     const status=await this.store.applyEvent({
       participantId:input.participantId,eventId:input.eventId,
       expectedRevision:current?.state.revision??null,state:response.state,response,demo:input.demo,

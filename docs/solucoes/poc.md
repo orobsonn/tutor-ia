@@ -40,7 +40,7 @@ Usar bot exclusivo, criado pelo responsável da conta. Nunca redirecionar webhoo
 
 Registrar webhook somente após verificar getMe do bot e publicar o endpoint desta POC: `/channels/telegram/webhook`, com secret_token próprio e updates de mensagens/callbacks. URLs, tokens e IDs privados ficam fora desta documentação pública. Código de ingress/sender está implementado, mas isso não comprova que um bot real já foi conectado.
 
-Comandos: /start, /data, /pausar, /retomar, /cancelar, /resultado, /resumo e /nova. /nova cria tentativa separada, preservando a anterior. Datas fechadas AAAA-MM-DD e botões assinados evitam depender de interpretação livre. Uma pergunta antiga não pode alterar revisão nova.
+Comandos: /start, /data, /pausar, /retomar, /cancelar, /resultado, /resumo e /nova. /nova cria tentativa separada, preservando a anterior. Datas fechadas DD/MM/AAAA (também aceita AAAA-MM-DD), normalizadas internamente, e botões assinados evitam depender de interpretação livre. Uma pergunta antiga não pode alterar revisão nova.
 
 ## Consulta e demonstração
 
@@ -58,3 +58,9 @@ Outbox pending → sending → sent/simulated/unknown. Pausa/remarcação invali
 A recuperação de sending antigo ocorre após dois minutos, sem reenvio. Jobs simulados não concorrem com o lote do Telegram. A leitura da equipe é intencionalmente simples e adequada à pequena demonstração; não é painel multicliente ou integração CRM.
 
 getMe, setWebhook, /start, callback assinado e persistência iniciais foram verificados no bot exclusivo. O ciclo principal pós-prova completo também foi executado, usando o cron publicado e antecipação isolada do vencimento de uma tentativa fictícia. A revisão final e a evidência datada indicam o que efetivamente foi verificado.
+
+## Liberar um avaliador
+
+O bot aceita somente IDs numéricos privados autorizados em TELEGRAM_ALLOWED_USER_IDS. Identificar a conta exata do avaliador antes de acrescentá-la à configuração privada, preservando as já autorizadas. Um @ pode ajudar a localizar a conta, mas não substitui o ID na regra de acesso. Não abrir o bot a todos para contornar essa identificação.
+
+Para consultar a tela, compartilhar privadamente o endereço e somente a credencial de leitura. Não é preciso conceder acesso à conta Cloudflare ou ao repositório. Para testar o pós-prova imediatamente, antecipar de forma controlada apenas a tentativa fictícia correspondente; o fluxo normal aguarda D+1.

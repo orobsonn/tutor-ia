@@ -310,3 +310,21 @@ test('intended date stays distinct from scheduled and undated without scheduling
  assert.equal(undated.examDateStatus,'undated');
  assert.equal(undated.examDate,null);
 });
+
+test('aceita data brasileira e preserva representação canônica e vencimento no fuso',()=>{
+ const candidate=send(createSurvey('demo','br-date'),'text','25/10/2026');
+ assert.equal(candidate.state.step,'confirm_date');assert.equal(candidate.state.candidateDate,'2026-10-25');
+ const confirmed=send(candidate.state,'choice','confirm');assert.equal(confirmed.state.examDate,'2026-10-25');assert.equal(confirmed.state.dueAt,'2026-10-26T13:00:00.000Z');
+ assert.match(confirmed.message,/25\/10\/2026/);assert.match(confirmed.message,/26\/10\/2026/);assert.match(confirmed.message,/10:00/);assert.ok(!confirmed.message.includes('T13:00'));
+});
+test('data brasileira impossível ou ambígua não altera estado nem agenda',()=>{
+ const state=createSurvey('demo','br-invalid');
+ for(const value of ['31/02/2027','25/13/2026','amanhã','1/2/26']){
+  const result=send(state,'text',value);assert.deepEqual(result.state,state);assert.equal(result.state.dueAt,null);
+ }
+});
+test('resumo apresenta resultado e avaliações em português e blocos separados',()=>{
+ let state=startFeedback();for(const value of ['approved','yes','much','yes','partly','little','harder','skip'])state=choose(state,value);
+ const summary=send(state,'text','/resumo').message;
+ assert.match(summary,/Aprovado/);assert.match(summary,/Em parte/);assert.match(summary,/Mais difícil/);assert.ok(summary.includes('\n\n'));assert.ok(!summary.includes('approved'));assert.ok(!summary.includes('performed'));
+});
