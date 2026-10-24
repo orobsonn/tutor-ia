@@ -75,3 +75,14 @@ test('one cron passage dispatches no more than twenty messages with due backlog'
  await service.tick(new Date('2026-11-03T13:00:00Z'));
  assert.equal(sent.length,20);
 });
+
+import {runDemo} from '../../src/service.ts';
+test('demo A remarca para outra data e invalida a agenda anterior',async(t)=>{
+ const {db,service}=setup();t.after(()=>db.close());
+ for(let i=0;i<3;i++)await runDemo(service,'A','next',now);
+ const before=(await service.store.getCurrent('demo:A'))!.state;
+ await runDemo(service,'A','reschedule',now);
+ await runDemo(service,'A','next',now);await runDemo(service,'A','next',now);
+ const after=(await service.store.getCurrent('demo:A'))!.state;
+ assert.notEqual(after.examDate,before.examDate);assert.notEqual(after.dueAt,before.dueAt);assert.ok(after.scheduleRevision>before.scheduleRevision);
+});

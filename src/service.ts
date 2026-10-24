@@ -96,7 +96,7 @@ export async function runDemo(service:SurveyService,scenario:'A'|'B'|'C',action:
   else if(row) {
     const state=row.state;
     switch(state.step) {
-      case 'date': event={kind:'text',value:new Date(now.getTime()+86400000).toISOString().slice(0,10)};break;
+      case 'date': event={kind:'text',value:new Date(now.getTime()+(state.scheduleRevision>0?2:1)*86400000).toISOString().slice(0,10)};break;
       case 'confirm_date':event={kind:'choice',value:'confirm'};break;
       case 'scheduled':
         if(state.dueAt) {effectiveNow=new Date(state.dueAt);event={kind:'followup'};}
